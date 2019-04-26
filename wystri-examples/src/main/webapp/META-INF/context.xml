@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/" containerSciFilter="" cachingAllowed="false">
+  <JarScanner>
+    <JarScanFilter pluggabilitySkip="*" tldSkip="*" defaultTldScan="false" />
+  </JarScanner>
+</Context>

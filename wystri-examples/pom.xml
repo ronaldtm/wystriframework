@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.wystriframework</groupId>
+  <artifactId>wystri-examples</artifactId>
+  <packaging>war</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>Wystri Examples</name>
+  <description></description>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <wicket.version>8.4.0</wicket.version>
+    <spring.version>5.1.4.RELEASE</spring.version>
+    <jetty9.version>9.4.15.v20190215</jetty9.version>
+    <slf4j.version>1.7.25</slf4j.version>
+    <p6spy.version>3.3.0</p6spy.version>
+    <junit.version>4.12</junit.version>
+    <querydsl.version>4.2.1</querydsl.version>
+    <javax.json.version>1.1.2</javax.json.version>
+    <!-- allowed values: R7, 1.0, 1.5, 2.0 or none -->
+    <wtp.version>none</wtp.version>
+    <xdocreport.version>2.0.1</xdocreport.version>
+    <freemarker.version>2.3.28</freemarker.version>
+    <itext.version>2.1.7</itext.version>
+    <poi.version>3.17</poi.version>
+    <commonmark.version>0.12.1</commonmark.version>
+  </properties>
+
+  <dependencies>
+
+    <!--  WYSTRI DEPENDENCIES -->
+    <dependency>
+      <groupId>org.wystriframework</groupId>
+      <artifactId>wystri-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.wystriframework</groupId>
+      <artifactId>wystri-querydsl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!--  WICKET DEPENDENCIES -->
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-core</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-spring</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>3.2.10</version>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>3.2.10</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- SPRING DEPENDENCIES -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <version>${spring.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- QUERY DSL -->
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-sql</artifactId>
+      <version>${querydsl.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.querydsl</groupId>
+      <artifactId>querydsl-sql-codegen</artifactId>
+      <version>${querydsl.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--  DB DEPENDENCIES -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.199</version>
+    </dependency>
+
+    <!-- LOGGING DEPENDENCIES - SLF4J-SIMPLE -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+
+    <!-- MISC DEPENDENCIES -->
+<!--     <dependency> -->
+<!--       <groupId>org.apache.commons</groupId> -->
+<!--       <artifactId>commons-lang3</artifactId> -->
+<!--       <version>3.7</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>org.apache.commons</groupId> -->
+<!--       <artifactId>commons-collections4</artifactId> -->
+<!--       <version>4.1</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>com.google.guava</groupId> -->
+<!--       <artifactId>guava</artifactId> -->
+<!--       <version>27.1-jre</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>javax.inject</groupId> -->
+<!--       <artifactId>javax.inject</artifactId> -->
+<!--       <version>1</version> -->
+<!--     </dependency> -->
+<!--     <dependency> -->
+<!--       <groupId>com.samskivert</groupId> -->
+<!--       <artifactId>jmustache</artifactId> -->
+<!--       <version>1.14</version> -->
+<!--     </dependency> -->
+
+    <!-- JETTY DEPENDENCIES FOR TESTING  -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>3.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-webapp</artifactId>
+      <version>${jetty9.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-plus</artifactId>
+      <version>${jetty9.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-jndi</artifactId>
+      <version>${jetty9.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- JUNIT DEPENDENCY FOR TESTING -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+  
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <resources>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <filtering>false</filtering>
+        <directory>src/main/java</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </resource>
+    </resources>
+    <testResources>
+      <testResource>
+        <filtering>false</filtering>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <filtering>false</filtering>
+        <directory>src/test/java</directory>
+        <includes>
+          <include>**</include>
+        </includes>
+        <excludes>
+          <exclude>**/*.java</exclude>
+        </excludes>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <inherited>true</inherited>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <encoding>UTF-8</encoding>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>http://repo1.maven.org/maven2/</url>
+    </repository>
+  </repositories>
+</project>

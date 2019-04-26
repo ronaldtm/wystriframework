@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:head>
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+</wicket:head>
+<body>
+<wicket:panel>
+<form wicket:id="form">
+  <div wicket:id="inputGroup" class="custom-file form-control-sm">
+    <input wicket:id="input" type="file" class="custom-file-input form-control-sm">
+    <label class="custom-file-label" wicket:for="input"><wicket:label></wicket:label></label>
+  </div>
+  <div wicket:id="linkGroup" class="input-group">
+    <a wicket:id="link" class="form-control form-control-sm"></a>
+    <div class="input-group-append">
+      <button wicket:id="clear" type="button" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times text-dark"/> Limpar</button>
+    </div>
+  </div>
+  <div wicket:id="progress" style="display:none;margin-top:1px;height:2px;"></div>
+</form>
+</wicket:panel>
+</body>
+</html>

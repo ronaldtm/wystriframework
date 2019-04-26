@@ -1,0 +1,15 @@
+{
+	"name": "jquery-textMask",
+	"version": "1.0.0",
+	"description": "",
+	"main": "jquery.textMask.js",
+	"author": {
+		"name": "Ronald Tetsuo Miura",
+		"email": "ronald.tetsuo@cl.df.gov.br"
+	},
+	"license": "MIT",
+	"dependencies": {
+		"text-mask-addons": "^3.8.0",
+		"vanilla-text-mask": "^5.1.1"
+	}
+}

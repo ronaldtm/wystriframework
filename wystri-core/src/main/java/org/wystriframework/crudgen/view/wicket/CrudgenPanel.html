@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<wicket:panel>
+
+<wicket:fragment wicket:id="default"></wicket:fragment>
+
+<wicket:fragment wicket:id="input">
+  <div class="form-group">
+    <label wicket:id="label"></label>
+    <input wicket:id="input" class="form-control form-control-sm" autocomplete="off">
+    <div wicket:id="feedback" class="invalid-feedback"></div>
+  </div>
+</wicket:fragment>
+
+<wicket:fragment wicket:id="check">
+  <div class="form-group">
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" wicket:id="input" />
+      <label class="form-check-label" wicket:id="label"></label>
+    </div>
+    <div class="invalid-feedback" wicket:id="feedback"></div>
+  </div>
+</wicket:fragment>
+
+<wicket:fragment wicket:id="checkgroup">
+  <div class="form-group" wicket:id="group">
+    <div wicket:id="items" class="form-check">
+      <input class="form-check-input" wicket:id="input" />
+      <label class="form-check-label" wicket:for="check"><spanwicket:id="label"></span></label>
+    </div>
+    <div class="invalid-feedback" wicket:id="feedback"></div>
+  </div>
+</wicket:fragment>
+
+<wicket:fragment wicket:id="INTEGER"></wicket:fragment>
+
+<wicket:fragment wicket:id="DECIMAL"></wicket:fragment>
+
+<wicket:fragment wicket:id="BOOLEAN"></wicket:fragment>
+
+<wicket:fragment wicket:id="MONEY"></wicket:fragment>
+
+<wicket:fragment wicket:id="DATE"></wicket:fragment>
+
+<wicket:fragment wicket:id="TIME"></wicket:fragment>
+
+<wicket:fragment wicket:id="TIMESTAMP"></wicket:fragment>
+
+<wicket:fragment wicket:id="FILE"></wicket:fragment>
+
+</wicket:panel>
+</html>

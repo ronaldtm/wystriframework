@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:wicket="http://wicket.apache.org">
+<body>
+
+<wicket:border wicket:id="labelFirst">
+  <div wicket:id="container">
+    <label wicket:id="label"></label>
+    <wicket:body />
+    <div wicket:id="feedback" class="invalid-feedback" style="display: block;"></div>
+  </div>
+</wicket:border>
+
+<wicket:border wicket:id="bodyFirst">
+  <div wicket:id="container">
+    <wicket:body />
+    <label wicket:id="label"></label>
+    <div wicket:id="feedback" class="invalid-feedback" style="display: block;"></div>
+  </div>
+</wicket:border>
+
+</body>
+</html>
