@@ -1,85 +1,70 @@
 package org.wystriframework.core.formbuilder;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.TextArea;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IField;
+import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
+import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
+import org.wystriframework.core.formbuilder.appenders.IntegerFieldAppender;
+import org.wystriframework.core.formbuilder.appenders.StringFieldAppender;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
-import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
+import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
+
+import com.google.common.collect.ImmutableMap;
 
 public class EntityFormBuilder implements Serializable {
 
+    private static final SerializableSupplier<IFieldComponentAppender<?>> DEFAULT_APPENDER = StringFieldAppender::new;
+
     @SuppressWarnings("unchecked")
-    public Component build(String id, IModel<IRecord> recordModel) {
-        final RecordModel<IRecord> record = new RecordModel<>(recordModel);
+    public Component build(String id, IModel<? extends IRecord> recordModel) {
+        final RecordModel<? extends IRecord> record = new RecordModel<>(recordModel);
 
-        final BSFormRowLayout layout = new BSFormRowLayout(id);
+        final BSFormRowLayout layout = new BSFormRowLayout(id, record);
+        layout.add(new EntityFormProcessorBehavior());
 
-        for (IField<?> field : record.getObject().getEntity().getFields()) {
-
-            switch (field.getType()) {
-                case LONG_STRING:
-                    layout.newFormGroup()
-                        .add(newLongStringField(record, (IField<String>) field));
-                    break;
-                case STRING:
-                    layout.newFormGroup()
-                        .add(newStringField(record, (IField<String>) field));
-                    break;
-                case INTEGER:
-                    layout.newFormGroup()
-                        .add(newIntegerField(record, (IField<Integer>) field));
-                    break;
-                case BOOLEAN:
-                    layout.newFormGroup()
-                        .setMode(BSFormGroup.Mode.CHECK)
-                        .add(new CheckBox(field.getName(), record.field((IField<Boolean>) field)));
-                    break;
-                case CHAR:
-                    break;
-                case DATE:
-                    break;
-                case DECIMAL:
-                    break;
-                case FILE:
-                    break;
-                case MONEY:
-                    break;
-                case TIME:
-                    break;
-                case TIMESTAMP:
-                    break;
-                default:
-                    break;
-            }
-
+        List<IFieldView<?>> list = new ArrayList<>();
+        for (final Iterator<? extends IField<?>> it = record.getObject().getEntity().fields().iterator(); it.hasNext();) {
+            final IField<?> field = it.next();
+            final IFieldView<?> view = appendField(layout, record, field);
+            list.add(view);
         }
 
-        return null;
+        return layout;
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private <F> IFieldView<F> appendField(final IBSFormGroupLayout layout, final RecordModel<? extends IRecord> record, IField<F> field) {
+        return getAppender(field)
+            .append(layout, record, field);
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<String> newStringField(final RecordModel<IRecord> record, IField<String> field) {
-        return new TextField<>(field.getName(), record.field(field));
+    private <F> IFieldComponentAppender<F> getAppender(IField<F> field) {
+        Class<?> fieldType = field.getType();
+
+        ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> appenders = getAppendersMap();
+
+        return (IFieldComponentAppender<F>) appenders.getOrDefault(fieldType, DEFAULT_APPENDER).get();
     }
 
-    @SuppressWarnings("unchecked")
-    private FormComponent<String> newLongStringField(final RecordModel<IRecord> record, IField<String> field) {
-        final TextArea<String> textarea = new TextArea<>(field.getName(), record.field(field));
-        textarea.add(IBehaviorShortcutsMixin.$b.attrAppend("rows", "5"));
-        return textarea;
+    protected ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> getAppendersMap() {
+        ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> appenders = new ConcurrentHashMap<>(ImmutableMap.<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> builder()
+            .put(String.class, DEFAULT_APPENDER)
+            .put(int.class, IntegerFieldAppender::new)
+            .put(Integer.class, IntegerFieldAppender::new)
+            .put(boolean.class, BooleanFieldAppender::new)
+            .put(Boolean.class, BooleanFieldAppender::new)
+            .build());
+        return appenders;
     }
-
-    @SuppressWarnings("unchecked")
-    private FormComponent<Integer> newIntegerField(final RecordModel<IRecord> record, IField<Integer> field) {
-        return new TextField<>(field.getName(), record.field(field), Integer.class);
-    }
-
 }

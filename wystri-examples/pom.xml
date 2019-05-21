@@ -47,6 +47,11 @@
       <artifactId>wystri-querydsl</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.wystriframework</groupId>
+      <artifactId>wystri-annotations</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!--  WICKET DEPENDENCIES -->
     <dependency>

@@ -1,11 +1,11 @@
 package org.wystriframework.core.definition;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface IEntity extends Serializable {
 
     String getName();
-    List<? extends IField<?>> getFields();
+    Stream<? extends IField<?>> fields();
 
 }

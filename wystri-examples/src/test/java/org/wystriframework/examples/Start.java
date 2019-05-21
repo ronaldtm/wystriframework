@@ -85,7 +85,7 @@ public class Start {
         // bb.getSessionHandler().getSessionManager()).setUsingCookies(false);
 
         server.setHandler(bb);
-        
+
         try {
             server.start();
             server.join();

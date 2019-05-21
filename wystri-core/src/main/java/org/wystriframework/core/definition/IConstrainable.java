@@ -5,8 +5,6 @@ import java.util.Map;
 
 public interface IConstrainable<T> {
 
-    String getRawValue();
-
     T getValue();
 
     boolean hasError();

@@ -27,7 +27,7 @@ public class BasePage extends WebPage implements IAjaxIndicatorAware {
         super.renderHead(response);
         response.render(JavaScriptHeaderItem.forReference(getApplication().getJavaScriptLibrarySettings().getJQueryReference()));
 
-        WystriConfiguration.get().renderHead(response);
+        WystriConfiguration.get().getHeaderContributor().renderHead(response);
     }
 
     @Override

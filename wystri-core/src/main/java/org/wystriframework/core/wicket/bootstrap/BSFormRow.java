@@ -12,14 +12,16 @@ import org.wystriframework.core.wicket.util.WicketComponentUtils;
 
 import com.google.common.base.Preconditions;
 
-public class BSFormRow extends Border {
+public class BSFormRow extends Border implements IBSFormGroupLayout {
 
     private SerializableBiFunction<String, MarkupContainer, Component> feedbackComponentFactory = (id, fence) -> new BSValidationFeedback(id, fence);
+    private BSFormLayoutConfig                                         layoutConfig             = new BSFormLayoutConfig(BSSize.sm);
 
     public BSFormRow(String id) {
         super(id);
     }
 
+    @Override
     public BSFormGroup newFormGroup() {
         BSFormGroup group = new BSFormGroup(newChildId())
             .setFeedbackComponentFactory((id, fence) -> getFeedbackComponentFactory().apply(id, fence));
@@ -27,10 +29,16 @@ public class BSFormRow extends Border {
         return group;
     }
 
-    public BSFormRow appendFormGroup(SerializableConsumer<BSFormGroup> callback) {
+    @Override
+    public IBSFormGroupLayout appendFormGroup(SerializableConsumer<BSFormGroup> callback) {
         final BSFormGroup group = newFormGroup();
         callback.accept(group);
-        return (BSFormRow) this;
+        return (IBSFormGroupLayout) this;
+    }
+
+    @Override
+    public BSFormLayoutConfig getLayoutConfig() {
+        return layoutConfig;
     }
 
     @Override
@@ -54,7 +62,9 @@ public class BSFormRow extends Border {
         }
     }
     //@formatter:off
+    @Override
     public SerializableBiFunction<String, MarkupContainer, Component> getFeedbackComponentFactory() { return feedbackComponentFactory; }
     public BSFormRow setFeedbackComponentFactory(SerializableBiFunction<String, MarkupContainer, Component> feedbackComponentFactory) { this.feedbackComponentFactory = feedbackComponentFactory; return this; }
+    public BSFormRow setLayoutConfig            (BSFormLayoutConfig                                                     layoutConfig) { this.layoutConfig             = layoutConfig            ; return this; }
     //@formatter:on
 }

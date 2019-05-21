@@ -22,6 +22,7 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ResourceLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.resource.AbstractResource;
@@ -29,8 +30,9 @@ import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.util.io.IOUtils;
 import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.util.time.Duration;
-import org.wystriframework.core.filemanager.SessionScopedTempFileManager;
-import org.wystriframework.core.util.IFileRef;
+import org.wystriframework.core.definition.IFileRef;
+import org.wystriframework.core.filemanager.ITempFileManager;
+import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
 import org.wystriframework.core.wicket.util.IModelShortcutsMixin;
 
@@ -44,7 +46,7 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     private final WebMarkupContainer   inputGroup;
     private final WebMarkupContainer   linkGroup;
     private final UploadBehavior       uploadBehavior;
-    private final ResourceLink<Object> downloadLink;
+    private final AbstractLink         downloadLink;
     private final ClearLink            clearLink;
     private final BSProgressBar        progressBar;
 
@@ -61,7 +63,7 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
         input = new FileUploadField("input", IModelShortcutsMixin.$m.getSet(this::getFileList, this::setFileList));
         uploadBehavior = new UploadBehavior("delayedsubmit");
         linkGroup = new WebMarkupContainer("linkGroup");
-        downloadLink = new ResourceLink<>("link", new DownloadResource());
+        downloadLink = newDownloadLink("link", new DownloadResource());
         clearLink = new ClearLink("clear");
         progressBar = new BSProgressBar("progress", form, input);
         inputGroup = new WebMarkupContainer("inputGroup");
@@ -92,6 +94,10 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
                     linkGroup.setVisible(fileSelected);
                 }
             }));
+    }
+
+    protected AbstractLink newDownloadLink(String id, DownloadResource downloadResource) {
+        return new ResourceLink<>(id, downloadResource);
     }
 
     protected void onUploadComplete(AjaxRequestTarget target) {}
@@ -150,9 +156,9 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
                 oldFileRef.invalidate();
 
             if (getFileList() != null && !getFileList().isEmpty()) {
+                final ITempFileManager fileman = WystriConfiguration.get().getTempFileManager();
                 final FileUpload fu = getFileList().get(0);
                 try (final InputStream is = fu.getInputStream()) {
-                    final SessionScopedTempFileManager fileman = SessionScopedTempFileManager.get(getSession());
                     fileRef = fileman.createTempFile(fu.getClientFileName(), is);
 
                     target.add(form);
@@ -174,11 +180,14 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     protected class DownloadResource extends AbstractResource {
         @Override
         protected ResourceResponse newResourceResponse(Attributes attributes) {
-            return new ResourceResponse()
-                .setCacheDuration(Duration.NONE)
+            final ResourceResponse resp = new ResourceResponse()
+                .setContentDisposition(ContentDisposition.INLINE)
+                .setCacheDuration(Duration.NONE);
+
+            return resp
                 .setFileName(getFileRef().getName())
                 .setContentLength(getFileRef().getSize())
-                .setContentDisposition(ContentDisposition.INLINE)
+                .setContentType(getFileRef().getMimeType())
                 .setWriteCallback(new WriteCallback() {
                     @Override
                     public void writeData(Attributes attributes) throws IOException {

@@ -8,13 +8,13 @@ public class FieldMetadata implements Serializable {
     private LinkedHashMap<Class<? extends Serializable>, Serializable> registry = new LinkedHashMap<>();
 
     @SuppressWarnings("unchecked")
-    public <T extends Serializable> T get(Class<T> type) {
-        return (T) registry.get(type);
+    public <T extends Serializable> T get(Class<T> key) {
+        return (T) registry.get(key);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Serializable> FieldMetadata put(T obj) {
-        registry.put(obj.getClass(), obj);
+    public <T extends Serializable> FieldMetadata put(Class<T> key, T obj) {
+        registry.put(key, obj);
         return this;
     }
 }

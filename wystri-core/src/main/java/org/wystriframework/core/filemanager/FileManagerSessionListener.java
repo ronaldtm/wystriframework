@@ -23,7 +23,7 @@ public class FileManagerSessionListener implements IInitializer, ISessionListene
 
     @Override
     public void onUnbound(String sessionId) {
-        SessionScopedTempFileManager tfm = SessionScopedTempFileManager.get(application, sessionId);
+        ITempFileManager tfm = SessionScopedTempFileManager.get(application, sessionId);
         try {
             tfm.close();
         } catch (IOException e) {

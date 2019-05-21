@@ -25,11 +25,11 @@ import com.samskivert.mustache.Template;
 
 public class BSFormControlMarkupResolver implements Serializable {
 
-    private static final MetaDataKey<ITemplateProvider<IBSFormLayoutConfig>> TEMPLATE_PROVIDER_KEY  = new MetaDataKey<ITemplateProvider<IBSFormLayoutConfig>>() {};
+    private static final MetaDataKey<ITemplateProvider<BSFormLayoutConfig>> TEMPLATE_PROVIDER_KEY  = new MetaDataKey<ITemplateProvider<BSFormLayoutConfig>>() {};
     private static final MetaDataKey<SerializableSupplier<String>>           CSS_CLASS_PROVIDER_KEY = new MetaDataKey<SerializableSupplier<String>>() {};
     private static final MetaDataKey<String>                                 INPUT_TYPE_KEY         = new MetaDataKey<String>() {};
 
-    public void appendFieldMarkup(UncheckedAppendable ta, IBSFormLayoutConfig config, Component child) {
+    public void appendFieldMarkup(UncheckedAppendable ta, BSFormLayoutConfig config, Component child) {
         final Map<String, Object> params = ImmutableMap.<String, Object> builder()
             .put("id", child.getId())
             .put("inputType", defaultIfNull(child.getMetaData(INPUT_TYPE_KEY), "text"))
@@ -41,15 +41,15 @@ public class BSFormControlMarkupResolver implements Serializable {
         ta.append(markup);
     }
 
-    private String getMarkup(IBSFormLayoutConfig config, Component child, final Map<String, Object> params) {
-        final ITemplateProvider<IBSFormLayoutConfig> templateProvider = child.getMetaData(TEMPLATE_PROVIDER_KEY);
+    private String getMarkup(BSFormLayoutConfig config, Component child, final Map<String, Object> params) {
+        final ITemplateProvider<BSFormLayoutConfig> templateProvider = child.getMetaData(TEMPLATE_PROVIDER_KEY);
         final String templateString = getTemplateString(config, child, templateProvider);
         final Template template = createTemplate(config, templateString);
 
         return template.execute(params);
     }
 
-    protected Template createTemplate(IBSFormLayoutConfig config, String templateString) {
+    protected Template createTemplate(BSFormLayoutConfig config, String templateString) {
         return Mustache.compiler()
             .defaultValue("")
             .emptyStringIsFalse(true)
@@ -58,7 +58,7 @@ public class BSFormControlMarkupResolver implements Serializable {
             .compile(templateString);
     }
 
-    protected String getTemplateString(IBSFormLayoutConfig config, Component child, final ITemplateProvider<IBSFormLayoutConfig> templateProvider) {
+    protected String getTemplateString(BSFormLayoutConfig config, Component child, final ITemplateProvider<BSFormLayoutConfig> templateProvider) {
         final BSSize size = config.getComponentsSize();
 
         if (templateProvider != null) {

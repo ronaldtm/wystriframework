@@ -1,11 +1,9 @@
 package org.wystriframework.core.filemanager;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,25 +18,25 @@ import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.Session;
 import org.apache.wicket.util.io.Streams;
-import org.wystriframework.core.util.IFileRef;
+import org.wystriframework.core.definition.IFileRef;
 
-public class SessionScopedTempFileManager implements Serializable, Closeable {
+public class SessionScopedTempFileManager implements ITempFileManager {
 
     private static final MetaDataKey<Map<String, SessionScopedTempFileManager>> APPLICATION_METADATA_KEY = new MetaDataKey<Map<String, SessionScopedTempFileManager>>() {};
 
     private static synchronized Map<String, SessionScopedTempFileManager> getFileManagers(Application application) {
-        Map<String, SessionScopedTempFileManager> map = application.getMetaData(APPLICATION_METADATA_KEY);
+        var map = application.getMetaData(APPLICATION_METADATA_KEY);
         if (map == null)
             application.setMetaData(APPLICATION_METADATA_KEY, map = new HashMap<>());
         return map;
     }
 
-    public static synchronized SessionScopedTempFileManager get(Session session) {
+    public static synchronized ITempFileManager get(Session session) {
         return get(session.getApplication(), session.getId());
     }
 
     public static SessionScopedTempFileManager get(final Application application, final String sessionId) {
-        final Map<String, SessionScopedTempFileManager> map = getFileManagers(application);
+        final var map = getFileManagers(application);
         SessionScopedTempFileManager tfm = map.get(sessionId);
         if (tfm == null)
             map.put(sessionId, tfm = new SessionScopedTempFileManager(sessionId));
@@ -62,8 +60,9 @@ public class SessionScopedTempFileManager implements Serializable, Closeable {
             entry.invalidate();
     }
 
+    @Override
     public IFileRef createTempFile(String name, InputStream content) throws IOException {
-        Path temp = Files.createTempFile(baseFolder, name + ".", ".tmp");
+        final Path temp = Files.createTempFile(baseFolder, name + ".", ".tmp");
         try (OutputStream out = Files.newOutputStream(temp, StandardOpenOption.WRITE)) {
             Streams.copy(content, out);
         }
@@ -120,6 +119,11 @@ public class SessionScopedTempFileManager implements Serializable, Closeable {
 
         Path getPath() {
             return Paths.get(path);
+        }
+
+        @Override
+        public String getMimeType() {
+            return null;
         }
     }
 }

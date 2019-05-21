@@ -25,11 +25,29 @@ public class RecordModel<R extends IRecord> implements IModel<R>, IComponentInhe
     }
 
     @Override
+    public void setObject(R object) {
+        this.object = object;
+    }
+
+    @Override
     public <W> IWrapModel<W> wrapOnInheritance(Component component) {
         return null;
     }
 
     public <F> IModel<F> field(IField<F> field) {
-        return () -> getObject().getValue(field);
+        return new IModel<F>() {
+            @Override
+            public F getObject() {
+                return RecordModel.this.getObject().getValue(field);
+            }
+            @Override
+            public void setObject(F object) {
+                RecordModel.this.getObject().setValue(field, object);
+            }
+            @Override
+            public void detach() {
+                RecordModel.this.detach();
+            }
+        };
     }
 }

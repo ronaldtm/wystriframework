@@ -1,7 +1,6 @@
 package org.wystriframework.crudgen.querydsl;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IField;
@@ -22,8 +21,8 @@ public class QDSLEntity<T> implements IEntity {
     }
 
     @Override
-    public List<? extends IField<?>> getFields() {
-        return Arrays.asList();
+    public Stream<? extends IField<?>> fields() {
+        return Stream.empty();
     }
 
     public RelationalPath<T> getEntityPath() {

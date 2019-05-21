@@ -1,20 +1,18 @@
 package org.wystriframework.core.wicket.bootstrap;
 
-import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.Session;
 import org.apache.wicket.behavior.Behavior;
-import org.apache.wicket.util.convert.IConverter;
+import org.apache.wicket.model.IModel;
 import org.danekja.java.util.function.serializable.SerializableBiFunction;
 import org.danekja.java.util.function.serializable.SerializableConsumer;
 import org.wystriframework.core.util.UncheckedAppendable;
 import org.wystriframework.core.wicket.component.TemplatePanel;
 import org.wystriframework.core.wicket.component.behavior.RefreshOnAjaxBehavior;
 
-public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfig {
+public class BSFormRowLayout extends TemplatePanel implements IBSFormGroupLayout {
 
-    private BSSize                                                     componentsSize            = BSSize.sm;
+    private BSFormLayoutConfig                                         layoutConfig              = new BSFormLayoutConfig(BSSize.sm);
     private boolean                                                    ajaxUpdateEnabled         = true;
     private BSFormControlMarkupResolver                                formControlMarkupResolver = new BSFormControlMarkupResolver();
     private SerializableBiFunction<String, MarkupContainer, Component> feedbackComponentFactory  = (id, fence) -> {
@@ -24,21 +22,33 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
                                                                                                      return feedback;
                                                                                                  };
 
+    public BSFormRowLayout(String id, IModel<?> model) {
+        super(id, BSFormRowLayout::template);
+        setDefaultModel(model);
+    }
+
     public BSFormRowLayout(String id) {
         super(id, BSFormRowLayout::template);
     }
 
+    @Override
     public BSFormRowLayout appendFormGroup(SerializableConsumer<BSFormGroup> callback) {
         final BSFormGroup group = newFormGroup();
         callback.accept(group);
         return (BSFormRowLayout) this;
     }
 
+    @Override
     public BSFormGroup newFormGroup() {
         BSFormGroup group = new BSFormGroup(this.newChildId())
-            .setFeedbackComponentFactory(feedbackComponentFactory);
+            .setFeedbackComponentFactory(getFeedbackComponentFactory());
         add(group);
         return group;
+    }
+
+    @Override
+    public BSFormLayoutConfig getLayoutConfig() {
+        return layoutConfig;
     }
 
     public BSFormRowLayout appendFormRow(SerializableConsumer<BSFormRow> callback) {
@@ -48,8 +58,9 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
     }
 
     public BSFormRow newFormRow() {
-        BSFormRow row = new BSFormRow(this.newChildId())
-            .setFeedbackComponentFactory(feedbackComponentFactory);
+        final BSFormRow row = new BSFormRow(this.newChildId())
+            .setLayoutConfig(getLayoutConfig())
+            .setFeedbackComponentFactory(getFeedbackComponentFactory());
         add(row);
         return row;
     }
@@ -62,6 +73,7 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
     
     public boolean isAjaxUpdateEnabled() { return ajaxUpdateEnabled; }
     public BSFormRowLayout setAjaxUpdateEnabled(boolean ajaxUpdateEnabled) { this.ajaxUpdateEnabled = ajaxUpdateEnabled; return this; }
+    
     //@formatter:on
 
     private String newChildId() {
@@ -86,7 +98,7 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
                 appendFormRowMarkup(ta, layout, (BSFormRow) child);
 
             } else {
-                layout.formControlMarkupResolver.appendFieldMarkup(ta, layout, child);
+                layout.formControlMarkupResolver.appendFieldMarkup(ta, layout.getLayoutConfig(), child);
             }
         }
         return sb;
@@ -95,7 +107,7 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
     private static void appendFormGroupMarkup(final UncheckedAppendable ta, final BSFormRowLayout layout, final BSFormGroup group) {
         ta.append("<div wicket:id='").append(group.getId()).append("'>");
         for (final Component groupChild : group.getBodyContainer())
-            layout.formControlMarkupResolver.appendFieldMarkup(ta, layout, groupChild);
+            layout.formControlMarkupResolver.appendFieldMarkup(ta, layout.getLayoutConfig(), groupChild);
         ta.append("</div>");
     }
 
@@ -107,15 +119,8 @@ public class BSFormRowLayout extends TemplatePanel implements IBSFormLayoutConfi
     }
 
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public String format(Object value) {
-        IConverter converter = Application.get().getConverterLocator().getConverter(value.getClass());
-        return converter.convertToString(value, Session.get().getLocale());
-    }
-
-    @Override
-    public BSSize getComponentsSize() {
-        return componentsSize;
+    public SerializableBiFunction<String, MarkupContainer, Component> getFeedbackComponentFactory() {
+        return feedbackComponentFactory;
     }
 
     private static class TemplateAppender implements UncheckedAppendable {

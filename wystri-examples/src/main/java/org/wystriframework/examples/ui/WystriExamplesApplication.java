@@ -6,6 +6,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.response.filter.AjaxServerAndClientTimeFilter;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.springframework.stereotype.Component;
+import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.examples.ui.view.crudgen.CrudgenDemoPage;
 import org.wystriframework.examples.ui.view.home.HomePage;
 
@@ -20,6 +21,8 @@ public class WystriExamplesApplication extends WebApplication {
         getResourceSettings().setThrowExceptionOnMissingResource(false);
         getApplicationSettings().setUploadProgressUpdatesEnabled(true);
         getRequestCycleSettings().addResponseFilter(new AjaxServerAndClientTimeFilter());
+
+        WystriConfiguration.get().setBeanLookup(new SpringBeanLookup(this));
 
         mountPage("home", HomePage.class);
 

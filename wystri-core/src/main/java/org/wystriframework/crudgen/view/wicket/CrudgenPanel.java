@@ -1,24 +1,29 @@
 package org.wystriframework.crudgen.view.wicket;
 
-import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.crudgen.view.wicket.theme.CrudgenTheme;
+import org.wystriframework.core.formbuilder.EntityFormBuilder;
+import org.wystriframework.core.wicket.component.photoswipe.PhotoSwipe;
 
 public class CrudgenPanel<R extends IRecord> extends Panel {
 
-    private static final String INPUT_FRAGMENT_ID = "input";
+    private EntityFormBuilder entityFormBuilder = new EntityFormBuilder();
 
     public CrudgenPanel(String id, IModel<R> model) {
         super(id, model);
+
+        add(new PhotoSwipe("photoSwipe"));
     }
 
-    public void rebuild(R record) {
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+        rebuild();
+    }
 
+    public void rebuild() {
+        addOrReplace(entityFormBuilder.build("entity", getModel()));
     }
 
     @SuppressWarnings("unchecked")
@@ -31,21 +36,4 @@ public class CrudgenPanel<R extends IRecord> extends Panel {
         return (R) getDefaultModelObject();
     }
 
-    public <T, F extends IField<T>> Component inputField(String id, IModel<F> model, IComponentCreator<? extends Component> creator) {
-        final Fragment fragment = new Fragment(id, INPUT_FRAGMENT_ID, this, model);
-        final Component input = creator.create("input");
-        return fragment
-            .add(new Label("label", model.map(it -> it.getName())))
-            .add(input)
-            .add(CrudgenTheme.get().fieldFeedback(id, fragment, input));
-    }
-
-    public <T, F extends IField<T>> Component checkField(String id, IModel<F> model, IComponentCreator<? extends Component> creator) {
-        final Fragment fragment = new Fragment(id, INPUT_FRAGMENT_ID, this, model);
-        final Component input = creator.create("check");
-        return fragment
-            .add(new Label("label", model.map(it -> it.getName())))
-            .add(input)
-            .add(CrudgenTheme.get().fieldFeedback(id, fragment, input));
-    }
 }
