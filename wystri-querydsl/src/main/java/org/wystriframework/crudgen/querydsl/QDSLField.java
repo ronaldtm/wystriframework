@@ -11,6 +11,7 @@ import org.wystriframework.core.definition.FieldMetadata;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
+import org.wystriframework.core.definition.IRecord;
 
 import com.querydsl.core.types.Path;
 import com.querydsl.sql.ColumnMetadata;
@@ -32,6 +33,21 @@ public class QDSLField<E, F> implements IField<F> {
     public QDSLField(QDSLEntity<E> entity, Path<F> path) {
         this.entity = entity;
         this.path = path;
+    }
+
+    @Override
+    public boolean isRequired(IRecord record) {
+        return !entity.getEntityPath().getMetadata(path).isNullable();
+    }
+    
+    @Override
+    public boolean isEnabled(IRecord record) {
+        return true;
+    }
+    
+    @Override
+    public boolean isVisible(IRecord record) {
+        return true;
     }
 
     @Override

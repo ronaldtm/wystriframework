@@ -1,32 +1,23 @@
 package org.wystriframework.examples.ui.view.crudgen;
 
-import static java.util.Arrays.*;
-
 import java.io.Serializable;
 
-import org.apache.wicket.feedback.FeedbackMessage;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.validation.ValidationError;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IFileRef;
+import org.wystriframework.core.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
-import org.wystriframework.core.wicket.bootstrap.BSColSize;
 import org.wystriframework.core.wicket.bootstrap.BSCustomFile;
-import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
-import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
-import org.wystriframework.core.wicket.util.FeedbackMessageUtils;
 import org.wystriframework.crudgen.annotation.AnnotatedRecord;
 import org.wystriframework.crudgen.annotation.Bool;
 import org.wystriframework.crudgen.annotation.Field;
@@ -63,55 +54,66 @@ public class CrudgenDemoPage extends WebPage {
 
             .add(layout
 
-                .appendFormGroup(fg -> fg
-                    .add(fUpload
-                        .setLabel(() -> "Upload de arquivo...")))
-
-                .appendFormRow(fr -> fr
-
-                    .appendFormGroup(fg -> fg
-                        .setGroupColSizes(BSColSize.col_2)
-                        .add(new TextField<>("codigo", codigo)
-                            .setRequired(true)
-                            .setLabel(() -> "Código")
-                            .add(BSValidationStatusBehavior.getInstance())))
-
-                    .appendFormGroup(fg -> fg
-                        .setGroupColSizes(BSColSize.col_8)
-                        .add(new TextField<>("nome", nome)
-                            .setRequired(true)
-                            .setLabel(() -> "Nome")
-                            .add(BSValidationStatusBehavior.getInstance())
-                            .add(FeedbackMessageUtils.keepMessage(FeedbackMessage.UNDEFINED, c -> "Mínimo de 10 caracteres")))) //
-                )
-
-                .appendFormRow(row -> row
-
-                    .appendFormGroup(fg -> fg
-                        .setGroupColSizes(BSColSize.col_4)
-                        .add(new DropDownChoice<>("sexo", sexo, asList(Sexo.values()))
-                            .setRequired(true)
-                            .setLabel(() -> "Sexo")
-                            .add(BSValidationStatusBehavior.getInstance()))) //
-                )
-
-                .appendFormGroup(fg -> fg.setMode(BSFormGroup.Mode.CHECK)
-                    .add(new CheckBox("aceite", aceite)
-                        .setRequired(true)
-                        .add(v -> {
-                            if (!Boolean.TRUE.equals(v.getValue()))
-                                v.error(new ValidationError("É necessário aceitar os termos de serviço para prosseguir"));
-                        })
-                        .setLabel(() -> "Aceito os termos de serviço")
-                        .add(BSValidationStatusBehavior.getInstance())))
-
-                .add(new Button("enviar").setModel(() -> "Enviar"))
+            //                .appendFormGroup(fg -> fg
+            //                    .add(fUpload
+            //                        .setLabel(() -> "Upload de arquivo...")))
+            //
+            //                .appendFormRow(fr -> fr
+            //
+            //                    .appendFormGroup(fg -> fg
+            //                        .setGroupColSizes(BSColSize.col_2)
+            //                        .add(new TextField<>("codigo", codigo)
+            //                            .setRequired(true)
+            //                            .setLabel(() -> "Código")
+            //                            .add(BSValidationStatusBehavior.getInstance())))
+            //
+            //                    .appendFormGroup(fg -> fg
+            //                        .setGroupColSizes(BSColSize.col_8)
+            //                        .add(new TextField<>("nome", nome)
+            //                            .setRequired(true)
+            //                            .setLabel(() -> "Nome")
+            //                            .add(BSValidationStatusBehavior.getInstance())
+            //                            .add(FeedbackMessageUtils.keepMessage(FeedbackMessage.UNDEFINED, c -> "Mínimo de 10 caracteres")))) //
+            //                )
+            //
+            //                .appendFormRow(row -> row
+            //
+            //                    .appendFormGroup(fg -> fg
+            //                        .setGroupColSizes(BSColSize.col_4)
+            //                        .add(new DropDownChoice<>("sexo", sexo, asList(Sexo.values()))
+            //                            .setRequired(true)
+            //                            .setLabel(() -> "Sexo")
+            //                            .add(BSValidationStatusBehavior.getInstance()))) //
+            //                )
+            //
+            //                .appendFormGroup(fg -> fg.setMode(BSFormGroup.Mode.CHECK)
+            //                    .add(new CheckBox("aceite", aceite)
+            //                        .setRequired(true)
+            //                        .add(v -> {
+            //                            if (!Boolean.TRUE.equals(v.getValue()))
+            //                                v.error(new ValidationError("É necessário aceitar os termos de serviço para prosseguir"));
+            //                        })
+            //                        .setLabel(() -> "Aceito os termos de serviço")
+            //                        .add(BSValidationStatusBehavior.getInstance())))
 
             )
 
             .add(new CrudgenPanel<>("crud", new Model<>(new AnnotatedRecord<>(new Person()))))
 
-        );
+            .add(new AjaxButton("enviar", () -> "Enviar", form) {
+                @Override
+                protected void onSubmit(AjaxRequestTarget target) {
+                    target.add(form);
+                    target.appendJavaScript("console.log('submit');");
+                }
+                @Override
+                protected void onError(AjaxRequestTarget target) {
+                    target.add(form);
+                    target.appendJavaScript("console.log('error');");
+                }
+            })
+
+            .add(new EntityFormProcessorBehavior()));
     }
 
     @Override

@@ -9,6 +9,9 @@ public interface IField<T> extends Serializable {
     IEntity getEntity();
     String getName();
     Class<? extends T> getType();
+    boolean isRequired(IRecord record);
+    boolean isEnabled(IRecord record);
+    boolean isVisible(IRecord record);
     List<IConstraint<? super T>> getConstraints();
     FieldMetadata getMetadata();
     IFieldDelegate<T> getDelegate();

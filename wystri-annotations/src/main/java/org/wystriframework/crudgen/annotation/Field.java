@@ -22,10 +22,13 @@ public @interface Field {
     Bool required() default Bool.UNDEFINED;
 
     Class<? extends SerializablePredicate> requiredIf() default SerializablePredicate.class;
+    String requiredError() default "";
 
     Class<? extends SerializablePredicate> enabledIf() default SerializablePredicate.class;
+    String disabledDefaultValue() default "";
 
     Class<? extends SerializablePredicate> visibleIf() default SerializablePredicate.class;
+    String invisibleDefaultValue() default "";
 
     Class<? extends IFieldDelegate> delegate() default AnnotatedFieldDelegate.class;
 }

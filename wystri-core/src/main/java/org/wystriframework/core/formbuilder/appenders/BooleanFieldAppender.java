@@ -1,54 +1,47 @@
 package org.wystriframework.core.formbuilder.appenders;
 
 import static java.util.Arrays.*;
+import static org.apache.commons.lang3.StringUtils.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.event.Broadcast;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
+import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFormat;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.definition.formats.BooleanFormat;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
-import org.wystriframework.core.formbuilder.EntityFormProcessor;
 import org.wystriframework.core.formbuilder.RecordModel;
+import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
-import org.wystriframework.core.wicket.component.behavior.AjaxFormComponentUpdatingActionBehavior;
 
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
     @Override
-    protected FormComponent<Boolean> newFormComponent(RecordModel<? extends IRecord> record, BSFormGroup formGroup, IField<Boolean> field) {
-        final IField<Boolean> ifield = (IField<Boolean>) field;
+    protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
+        final IField<Boolean> ifield = (IField<Boolean>) ctx.getField();
 
-        final FormComponent<Boolean> fc;
-        if (field.getType().isPrimitive()) {
-            formGroup.setMode(BSFormGroup.Mode.CHECK);
-            fc = newBooleanCheckField(record, ifield);
+        if (ctx.getField().getType().isPrimitive()) {
+            ctx.getFormGroup().setMode(BSFormGroup.Mode.CHECK);
+            return newBooleanCheckField(ctx.getRecord(), ifield, ctx.getRequiredErrorMessageSupplier());
         } else {
-            fc = newBooleanSelectField(record, ifield);
+            return newBooleanSelectField(ctx.getRecord(), ifield, ctx.getRequiredErrorMessageSupplier());
         }
-
-        fc.add(new AjaxFormComponentUpdatingActionBehavior("change")
-            .andThen(t -> t.add(formGroup))
-            .andThen(t -> fc.send(fc, Broadcast.BUBBLE, new EntityFormProcessor())));
-
-        return fc;
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
+    private FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord> record, IField<Boolean> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
         return new CheckBox(field.getName(), record.field(field));
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<Boolean> newBooleanSelectField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
+    private FormComponent<Boolean> newBooleanSelectField(final RecordModel<? extends IRecord> record, IField<Boolean> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
         field.getMetadata().put(IFormat.class, new BooleanFormat());
         field.getMetadata().get(IFormat.class);
         final IChoiceRenderer<Boolean> choiceRenderer = new IChoiceRenderer<Boolean>() {
@@ -65,6 +58,16 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
                 return null;
             }
         };
-        return new DropDownChoice<>(field.getName(), record.field(field), new ArrayList<>(asList(true, false)), choiceRenderer);
+        return new DropDownChoice<>(field.getName(), record.field(field), new ArrayList<>(asList(true, false)), choiceRenderer) {
+            @Override
+            protected void reportRequiredError() {
+                final String msg = requiredErrorMessageSupplier.get();
+                if (isNotBlank(msg)) {
+                    super.error(WystriConfiguration.get().localizedString(msg));
+                } else {
+                    super.reportRequiredError();
+                }
+            }
+        };
     }
 }

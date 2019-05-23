@@ -1,10 +1,12 @@
 package org.wystriframework.core.formbuilder;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
@@ -12,6 +14,8 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
+import org.danekja.java.util.function.serializable.SerializableConsumer;
+import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
@@ -19,93 +23,163 @@ import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
+import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
 import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
 
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
     @SuppressWarnings("unchecked")
-    protected abstract FormComponent<T> newFormComponent(final RecordModel<? extends IRecord> record, BSFormGroup formGroup, IField<T> field);
+    protected abstract FormComponent<T> newFormComponent(FieldComponentContext<T> ctx);
 
     @Override
     public IFieldView<T> append(IBSFormGroupLayout layout, RecordModel<? extends IRecord> record, IField<T> field) {
-        BSFormGroup formGroup = layout.newFormGroup();
-        FormComponent<T> fc = newFormComponent(record, formGroup, field);
+        final BSFormGroup formGroup = layout.newFormGroup();
+        final FieldComponentContext<T> ctx = new FieldComponentContext<T>(record, formGroup, field, () -> "");
+
+        final FormComponent<T> fc = newFormComponent(ctx);
         formGroup.add(fc);
 
-        return configure(formGroup, fc, field, record);
+        return configure(ctx.setFieldComponent(fc));
     }
 
-    protected IFieldView<T> configure(BSFormGroup formGroup, FormComponent<T> fieldComponent, IField<T> field, RecordModel<? extends IRecord> record) {
-        IFieldView<T> fieldView = new FieldViewImpl<>(formGroup, fieldComponent, field);
+    protected IFieldView<T> configure(FieldComponentContext<T> ctx) {
+        final BSFormGroup formGroup = ctx.getFormGroup();
+        final FormComponent<T> fieldComponent = ctx.getFieldComponent();
+        final IField<T> field = ctx.getField();
+
+        final IFieldView<T> fieldView = new FieldViewImpl<>(ctx);
         EntityFormProcessor.associateView(fieldComponent, fieldView);
 
-        fieldComponent.setLabel(new LabelModel<>(field));
-        fieldComponent.add(new ConstraintValidator<>(field));
-        fieldComponent.add(new Behavior() {
-            @Override
-            @SuppressWarnings("unchecked")
-            public void onConfigure(Component comp) {
-                super.onConfigure(comp);
-                field.getDelegate().onAfterProcessed(fieldView, record.getObject());
-            }
-        });
+        fieldComponent
+            .setLabel(new LabelModel<>(field))
+            .add(new ConstraintValidator<>(field))
+            .add(BSValidationStatusBehavior.getInstance())
+            .add(new OnAfterProcessedBehavior(field, fieldView, ctx.getRecord()));
+
+        final SerializableConsumer<AjaxRequestTarget> refreshGroup = t -> {
+            t.add(formGroup);
+            new EntityFormProcessor().bubble(fieldComponent);
+        };
+        addAjaxUpdateBehavior(fieldComponent, refreshGroup, refreshGroup);
+
         return fieldView;
     }
 
-    protected static class FieldViewImpl<T> implements IFieldView<T> {
-        private final FormComponent<T> fc;
-        private final BSFormGroup      formGroup;
-        private final IField<T>        field;
-        protected FieldViewImpl(BSFormGroup formGroup, FormComponent<T> fc, IField<T> field) {
-            this.fc = fc;
+    @SuppressWarnings("unchecked")
+    protected void addAjaxUpdateBehavior(FormComponent<T> fieldComponent, SerializableConsumer<AjaxRequestTarget> onSuccess, SerializableConsumer<AjaxRequestTarget> onError) {
+        fieldComponent.add(new AjaxFormComponentUpdatingBehavior("change") {
+            @Override
+            protected void onUpdate(AjaxRequestTarget target) {
+                onSuccess.accept(target);
+            }
+            @Override
+            protected void onError(AjaxRequestTarget target, RuntimeException e) {
+                onError.accept(target);
+            }
+        });
+    }
+
+    public static class FieldComponentContext<T> implements Serializable {
+        private RecordModel<? extends IRecord> record;
+        private BSFormGroup                    formGroup;
+        private IField<T>                      field;
+        private SerializableSupplier<String>   requiredErrorMessageSupplier;
+        private FormComponent<T>               fieldComponent;
+
+        public FieldComponentContext(RecordModel<? extends IRecord> record, BSFormGroup formGroup, IField<T> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
+            this.record = record;
             this.formGroup = formGroup;
             this.field = field;
+            this.requiredErrorMessageSupplier = requiredErrorMessageSupplier;
         }
-        @Override
+        public RecordModel<? extends IRecord> getRecord() {
+            return record;
+        }
+        public BSFormGroup getFormGroup() {
+            return formGroup;
+        }
         public IField<T> getField() {
             return field;
         }
+        public SerializableSupplier<String> getRequiredErrorMessageSupplier() {
+            return requiredErrorMessageSupplier;
+        }
+        public FormComponent<T> getFieldComponent() {
+            return fieldComponent;
+        }
+        public FieldComponentContext<T> setFieldComponent(FormComponent<T> fieldComponent) {
+            this.fieldComponent = fieldComponent;
+            return this;
+        }
+    }
+
+    protected static class FieldViewImpl<T> implements IFieldView<T> {
+        private final FieldComponentContext<T> ctx;
+        protected FieldViewImpl(FieldComponentContext<T> ctx) {
+            this.ctx = ctx;
+        }
+        @Override
+        public IField<T> getField() {
+            return ctx.getField();
+        }
         @Override
         public T getValue() {
-            return fc.getModelObject();
+            return ctx.getFieldComponent().getModelObject();
         }
         @Override
         public void setValue(T value) {
-            if (!Objects.equals(fc.getModelObject(), value))
+            if (!Objects.equals(ctx.getFieldComponent().getModelObject(), value))
                 markDirty();
-            fc.setModelObject(value);
+            ctx.getFieldComponent().setModelObject(value);
         }
         @Override
         public void setRequired(boolean required) {
-            if (fc.isRequired() != required)
+            if (ctx.getFieldComponent().isRequired() != required)
                 markDirty();
-            fc.setRequired(required);
+            ctx.getFieldComponent().setRequired(required);
         }
         @Override
         public void setVisible(boolean visible) {
-            if (fc.isVisible() != visible)
+            if (ctx.getFieldComponent().isVisible() != visible)
                 markDirty();
-            fc.setVisible(visible);
+            ctx.getFieldComponent().setVisible(visible);
         }
         @Override
         public void setEnabled(boolean enabled) {
-            if (fc.isEnabled() != enabled)
+            if (ctx.getFieldComponent().isEnabled() != enabled)
                 markDirty();
-            fc.setEnabled(enabled);
+            ctx.getFieldComponent().setEnabled(enabled);
         }
         @Override
         public void error(String msg) {
-            fc.error(new ValidationError(WystriConfiguration.get().localizedString(msg)));
+            ctx.getFieldComponent().error(new ValidationError(WystriConfiguration.get().localizedString(msg)));
             markDirty();
         }
         @Override
         public void info(String msg) {
-            fc.info(new ValidationError(WystriConfiguration.get().localizedString(msg)));
+            ctx.getFieldComponent().info(new ValidationError(WystriConfiguration.get().localizedString(msg)));
             markDirty();
         }
         @Override
         public void markDirty() {
-            RequestCycle.get().find(AjaxRequestTarget.class).ifPresent(t -> t.add(formGroup));
+            RequestCycle.get().find(AjaxRequestTarget.class).ifPresent(t -> t.add(ctx.getFormGroup()));
+        }
+    }
+
+    private class OnAfterProcessedBehavior extends Behavior {
+        private final IField<T>                      field;
+        private final IFieldView<T>                  fieldView;
+        private final RecordModel<? extends IRecord> record;
+        protected OnAfterProcessedBehavior(IField<T> field, IFieldView<T> fieldView, RecordModel<? extends IRecord> record) {
+            this.field = field;
+            this.fieldView = fieldView;
+            this.record = record;
+        }
+        @Override
+        @SuppressWarnings("unchecked")
+        public void onConfigure(Component comp) {
+            super.onConfigure(comp);
+            field.getDelegate().onAfterProcessed(fieldView, record.getObject());
         }
     }
 

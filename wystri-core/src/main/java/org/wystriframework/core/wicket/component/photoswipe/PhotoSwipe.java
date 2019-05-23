@@ -39,6 +39,8 @@ public class PhotoSwipe extends Panel {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
 
+        response.render(JavaScriptHeaderItem.forReference(getApplication().getJavaScriptLibrarySettings().getJQueryReference()));
+
         response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PhotoSwipe.class, "res/photoswipe.js")));
         response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PhotoSwipe.class, "res/photoswipe-ui-default.js")));
         response.render(JavaScriptHeaderItem.forReference(new PackageResourceReference(PhotoSwipe.class, "res/jquery-photoswipe.js")));

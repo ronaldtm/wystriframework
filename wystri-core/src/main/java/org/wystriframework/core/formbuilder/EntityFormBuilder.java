@@ -30,7 +30,6 @@ public class EntityFormBuilder implements Serializable {
         final RecordModel<? extends IRecord> record = new RecordModel<>(recordModel);
 
         final BSFormRowLayout layout = new BSFormRowLayout(id, record);
-        layout.add(new EntityFormProcessorBehavior());
 
         List<IFieldView<?>> list = new ArrayList<>();
         for (final Iterator<? extends IField<?>> it = record.getObject().getEntity().fields().iterator(); it.hasNext();) {

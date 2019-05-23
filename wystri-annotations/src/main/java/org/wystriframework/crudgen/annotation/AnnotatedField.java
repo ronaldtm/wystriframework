@@ -1,15 +1,21 @@
 package org.wystriframework.crudgen.annotation;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.wicket.core.util.lang.PropertyResolver;
+import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.FieldMetadata;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
+import org.wystriframework.core.definition.IRecord;
+import org.wystriframework.core.util.ReflectionUtils;
+import org.wystriframework.core.wicket.WystriConfiguration;
 
 public class AnnotatedField<E, F> implements IField<F> {
 
@@ -28,6 +34,29 @@ public class AnnotatedField<E, F> implements IField<F> {
         this.entity = entity;
         this.name = field.getName();
         this.delegate = new AnnotatedFieldDelegate<>();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isRequired(IRecord record) {
+        final Field field = getFieldAnnotation(Field.class);
+        if (field.required() != Bool.UNDEFINED) {
+            return field.required().isTrue();
+        } else {
+            return testPredicate((AnnotatedRecord<E>) record, field.requiredIf(), false);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isEnabled(IRecord record) {
+        return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).enabledIf(), true);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean isVisible(IRecord record) {
+        return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).visibleIf(), true);
     }
 
     @Override
@@ -72,6 +101,21 @@ public class AnnotatedField<E, F> implements IField<F> {
     public void setConstraints(Collection<? extends IConstraint<F>> constraints) {
         this.constraints.clear();
         this.constraints.addAll(constraints);
+    }
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static <E> boolean testPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
+        if (!Modifier.isAbstract(predicateClass.getModifiers())) {
+            Type[] argTypes = ReflectionUtils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
+            if (argTypes[0] == AnnotatedRecord.class) {
+                SerializablePredicate<AnnotatedRecord<E>> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
+                return predicate.test(arecord);
+            } else {
+                SerializablePredicate<E> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
+                return predicate.test(arecord.getObject());
+            }
+        }
+        return defaultValue;
     }
 
     //@formatter:off

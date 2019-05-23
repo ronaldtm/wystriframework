@@ -2,7 +2,6 @@ package org.wystriframework.crudgen.annotation;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.util.function.Consumer;
 
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IFieldDelegate;
@@ -26,35 +25,34 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
         processEnabled(view, arecord, field);
     }
 
+    @SuppressWarnings("unchecked")
     private void processRequired(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        if (field.required() != Bool.UNDEFINED) {
-            view.setRequired(field.required().isTrue());
-        } else {
-            processPredicate(arecord, field.requiredIf(), view::setRequired);
-        }
+        AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
+        view.setRequired(afield.isRequired(arecord));
     }
 
     @SuppressWarnings("unchecked")
-    private void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        processPredicate(arecord, field.visibleIf(), view::setVisible);
+    private static <E, F> void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+        view.setVisible(processPredicate(arecord, field.visibleIf(), true));
     }
 
     @SuppressWarnings("unchecked")
-    private void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        processPredicate(arecord, field.enabledIf(), view::setEnabled);
+    private static <E, F> void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+        view.setEnabled(processPredicate(arecord, field.enabledIf(), true));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void processPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, Consumer<Boolean> callback) {
+    private static <E> boolean processPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
         if (!Modifier.isAbstract(predicateClass.getModifiers())) {
             Type[] argTypes = ReflectionUtils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
             if (argTypes[0] == AnnotatedRecord.class) {
                 SerializablePredicate<AnnotatedRecord<E>> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
-                callback.accept(predicate.test(arecord));
+                return predicate.test(arecord);
             } else {
                 SerializablePredicate<E> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
-                callback.accept(predicate.test(arecord.getObject()));
+                return predicate.test(arecord.getObject());
             }
         }
+        return defaultValue;
     }
 }

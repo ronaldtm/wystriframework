@@ -3,6 +3,7 @@ package org.wystriframework.core.formbuilder;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.MetaDataKey;
+import org.apache.wicket.event.Broadcast;
 import org.apache.wicket.util.visit.IVisit;
 import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IFieldView;
@@ -22,14 +23,23 @@ public class EntityFormProcessor {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public void process(MarkupContainer rootContainer) {
-        final IRecord record = (IRecord) rootContainer.getDefaultModelObject();
+        MarkupContainer recordContainer = rootContainer.visitChildren(MarkupContainer.class, (MarkupContainer comp, IVisit<MarkupContainer> visit) -> {
+            if (comp.getDefaultModelObject() instanceof IRecord)
+                visit.stop(comp);
+        });
 
-        rootContainer.visitChildren((Component comp, IVisit<Void> visit) -> {
+        final IRecord record = (IRecord) recordContainer.getDefaultModelObject();
+
+        recordContainer.visitChildren((Component comp, IVisit<Void> visit) -> {
             IFieldView<?> view = EntityFormProcessor.getView(comp);
             if (view != null) {
                 IFieldDelegate delegate = view.getField().getDelegate();
                 delegate.onAfterProcessed(view, record);
             }
         });
+    }
+    
+    public void bubble(Component source) {
+        source.send(source, Broadcast.BUBBLE, new EntityFormProcessor());
     }
 }
