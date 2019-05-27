@@ -15,6 +15,8 @@ public interface IField<T> extends Serializable {
     List<IConstraint<? super T>> getConstraints();
     FieldMetadata getMetadata();
     IFieldDelegate<T> getDelegate();
+    String requiredError();
+
 
     @SuppressWarnings("unchecked")
     default <C extends IConstraint<? super T>> Optional<C> getConstraint(Class<C> type) {

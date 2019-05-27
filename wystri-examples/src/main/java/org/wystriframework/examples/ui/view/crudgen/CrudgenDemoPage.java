@@ -21,6 +21,9 @@ import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.crudgen.annotation.AnnotatedRecord;
 import org.wystriframework.crudgen.annotation.Bool;
 import org.wystriframework.crudgen.annotation.Field;
+import org.wystriframework.crudgen.annotation.FormLayout;
+import org.wystriframework.crudgen.annotation.FormLayout.Cell;
+import org.wystriframework.crudgen.annotation.FormLayout.Row;
 import org.wystriframework.crudgen.view.wicket.CrudgenPanel;
 
 public class CrudgenDemoPage extends WebPage {
@@ -123,14 +126,20 @@ public class CrudgenDemoPage extends WebPage {
         WystriConfiguration.get().getHeaderContributor().renderHead(response);
     }
 
+    @FormLayout({
+        //@formatter:off
+        @Row({ @Cell(value = "name"     , spec = "col-md-8"), @Cell("annonymous") }),
+        @Row({ @Cell(value = "matricula", spec = "col-md-4") }),
+        //@formatter:on
+    })
     public static class Person implements Serializable {
 
         @Field(
-            requiredIf = IsNotAnnonymous.class,
+            requiredIf = IsNotAnnonymous.class, requiredError = "Campo obrigatório",
             enabledIf = IsNotAnnonymous.class)
         public String name;
 
-        @Field(required = Bool.TRUE)
+        @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
         public int    matricula;
 
         @Field

@@ -7,5 +7,6 @@ public interface IEntity extends Serializable {
 
     String getName();
     Stream<? extends IField<?>> fields();
+    IFieldLayout getLayout();
 
 }

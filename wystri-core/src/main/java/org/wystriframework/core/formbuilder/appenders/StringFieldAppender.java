@@ -7,11 +7,11 @@ import java.util.Optional;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.definition.constraints.MaxLengthConstraint;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
+import org.wystriframework.core.formbuilder.FieldComponentContext;
 import org.wystriframework.core.formbuilder.RecordModel;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
@@ -24,16 +24,16 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
         final Optional<MaxLengthConstraint> maxLength = stringField.getConstraint(MaxLengthConstraint.class);
 
         return (maxLength.isPresent() && maxLength.get().getMaxLength() > 255)
-            ? newLongStringField(ctx.getRecord(), (IField<String>) ctx.getField(), ctx.getRequiredErrorMessageSupplier())
-            : newStringField(ctx.getRecord(), (IField<String>) ctx.getField(), ctx.getRequiredErrorMessageSupplier());
+            ? newLongStringField(ctx.getRecord(), (IField<String>) ctx.getField())
+            : newStringField(ctx.getRecord(), (IField<String>) ctx.getField());
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<String> newStringField(final RecordModel<? extends IRecord> record, IField<String> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
+    private FormComponent<String> newStringField(final RecordModel<? extends IRecord> record, IField<String> field) {
         return new TextField<String>(field.getName(), record.field(field)) {
             @Override
             protected void reportRequiredError() {
-                final String msg = requiredErrorMessageSupplier.get();
+                final String msg = field.requiredError();
                 if (isNotBlank(msg)) {
                     super.error(WystriConfiguration.get().localizedString(msg));
                 } else {
@@ -44,7 +44,7 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<String> newLongStringField(final RecordModel<? extends IRecord> record, IField<String> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
+    private FormComponent<String> newLongStringField(final RecordModel<? extends IRecord> record, IField<String> field) {
         final TextArea<String> comp = new TextArea<>(field.getName(), record.field(field));
         comp.add(IBehaviorShortcutsMixin.$b.attrAppend("rows", "5"));
         return comp;

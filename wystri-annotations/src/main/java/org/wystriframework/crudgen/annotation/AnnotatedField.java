@@ -48,6 +48,12 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
+    public String requiredError() {
+        final Field field = getFieldAnnotation(Field.class);
+        return field.requiredError();
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public boolean isEnabled(IRecord record) {
         return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).enabledIf(), true);

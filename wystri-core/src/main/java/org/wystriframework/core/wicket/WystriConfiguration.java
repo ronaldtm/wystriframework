@@ -7,6 +7,7 @@ import org.apache.wicket.Session;
 import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.model.IModel;
 import org.wystriframework.core.filemanager.ITempFileManager;
 import org.wystriframework.core.filemanager.SessionScopedTempFileManager;
 import org.wystriframework.core.util.IBeanLookup;
@@ -38,7 +39,9 @@ public class WystriConfiguration {
     public String localizedString(String key) {
         return Application.get().getResourceSettings().getLocalizer().getString(key, null, key);
     }
-
+    public String localizedString(String key, IModel<?> model) {
+        return Application.get().getResourceSettings().getLocalizer().getString(key, null, model, key);
+    }
 
     public static WystriConfiguration get() {
         return INSTANCE;

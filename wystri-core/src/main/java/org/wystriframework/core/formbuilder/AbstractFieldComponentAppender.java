@@ -1,6 +1,5 @@
 package org.wystriframework.core.formbuilder;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,7 +14,6 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
 import org.danekja.java.util.function.serializable.SerializableConsumer;
-import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
@@ -24,7 +22,6 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
-import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
 
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
@@ -32,9 +29,9 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
     protected abstract FormComponent<T> newFormComponent(FieldComponentContext<T> ctx);
 
     @Override
-    public IFieldView<T> append(IBSFormGroupLayout layout, RecordModel<? extends IRecord> record, IField<T> field) {
-        final BSFormGroup formGroup = layout.newFormGroup();
-        final FieldComponentContext<T> ctx = new FieldComponentContext<T>(record, formGroup, field, () -> "");
+    public IFieldView<T> append(FieldComponentContext<T> ctx) {
+        final BSFormGroup formGroup = ctx.getLayout().newFormGroup();
+        ctx.setFormGroup(formGroup);
 
         final FormComponent<T> fc = newFormComponent(ctx);
         formGroup.add(fc);
@@ -77,40 +74,6 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
                 onError.accept(target);
             }
         });
-    }
-
-    public static class FieldComponentContext<T> implements Serializable {
-        private RecordModel<? extends IRecord> record;
-        private BSFormGroup                    formGroup;
-        private IField<T>                      field;
-        private SerializableSupplier<String>   requiredErrorMessageSupplier;
-        private FormComponent<T>               fieldComponent;
-
-        public FieldComponentContext(RecordModel<? extends IRecord> record, BSFormGroup formGroup, IField<T> field, SerializableSupplier<String> requiredErrorMessageSupplier) {
-            this.record = record;
-            this.formGroup = formGroup;
-            this.field = field;
-            this.requiredErrorMessageSupplier = requiredErrorMessageSupplier;
-        }
-        public RecordModel<? extends IRecord> getRecord() {
-            return record;
-        }
-        public BSFormGroup getFormGroup() {
-            return formGroup;
-        }
-        public IField<T> getField() {
-            return field;
-        }
-        public SerializableSupplier<String> getRequiredErrorMessageSupplier() {
-            return requiredErrorMessageSupplier;
-        }
-        public FormComponent<T> getFieldComponent() {
-            return fieldComponent;
-        }
-        public FieldComponentContext<T> setFieldComponent(FormComponent<T> fieldComponent) {
-            this.fieldComponent = fieldComponent;
-            return this;
-        }
     }
 
     protected static class FieldViewImpl<T> implements IFieldView<T> {

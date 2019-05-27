@@ -192,7 +192,7 @@ enum BSColSizeDefaults implements BSColSize {
     public String cssClass() {
         return cssClass;
     }
-    
+
     @Override
     public String toString() {
         return cssClass();

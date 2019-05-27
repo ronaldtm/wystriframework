@@ -4,6 +4,7 @@ import java.util.stream.Stream;
 
 import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IField;
+import org.wystriframework.core.definition.IFieldLayout;
 
 public class AnnotatedEntity<T> implements IEntity {
 
@@ -25,6 +26,11 @@ public class AnnotatedEntity<T> implements IEntity {
     public Stream<? extends IField<?>> fields() {
         return Stream.of(getObjectClass().getDeclaredFields())
             .map(field -> new AnnotatedField<>(this, field));
+    }
+
+    @Override
+    public IFieldLayout getLayout() {
+        return new AnnotatedFieldLayout<>(this);
     }
 
     @SuppressWarnings("unchecked")

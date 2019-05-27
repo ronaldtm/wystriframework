@@ -41,6 +41,11 @@ public class QDSLField<E, F> implements IField<F> {
     }
     
     @Override
+    public String requiredError() {
+        return null;
+    }
+    
+    @Override
     public boolean isEnabled(IRecord record) {
         return true;
     }

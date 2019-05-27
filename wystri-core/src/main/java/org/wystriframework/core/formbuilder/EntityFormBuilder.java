@@ -1,22 +1,29 @@
 package org.wystriframework.core.formbuilder;
 
+import static org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin.*;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
+import org.danekja.java.util.function.serializable.SerializableConsumer;
 import org.danekja.java.util.function.serializable.SerializableSupplier;
+import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IField;
+import org.wystriframework.core.definition.IFieldLayout.Cell;
+import org.wystriframework.core.definition.IFieldLayout.Row;
+import org.wystriframework.core.definition.IFieldLayout.Section;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.IntegerFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.StringFieldAppender;
+import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
+import org.wystriframework.core.wicket.bootstrap.BSFormSectionListView;
 import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
 
 import com.google.common.collect.ImmutableMap;
@@ -28,23 +35,28 @@ public class EntityFormBuilder implements Serializable {
     @SuppressWarnings("unchecked")
     public Component build(String id, IModel<? extends IRecord> recordModel) {
         final RecordModel<? extends IRecord> record = new RecordModel<>(recordModel);
+        final IEntity entity = record.getObject().getEntity();
 
-        final BSFormRowLayout layout = new BSFormRowLayout(id, record);
-
-        List<IFieldView<?>> list = new ArrayList<>();
-        for (final Iterator<? extends IField<?>> it = record.getObject().getEntity().fields().iterator(); it.hasNext();) {
-            final IField<?> field = it.next();
-            final IFieldView<?> view = appendField(layout, record, field);
-            list.add(view);
+        final BSFormSectionListView sectionsView = new BSFormSectionListView(id);
+        for (Section section : entity.getLayout().getSections()) {
+            final BSFormRowLayout layout = new BSFormRowLayout("layout", record);
+            sectionsView.appendSection(section::getTitle, layout);
+            for (Row row : section.getRows()) {
+                final List<Cell> cells = row.getCells();
+                final IBSFormGroupLayout formRow = layout.newFormRow();
+                for (Cell cell : cells) {
+                    appendField(formRow, record, cell.getField(), g -> g.add($b.attrAppend("class", " " + cell.getSpec())));
+                }
+            }
         }
 
-        return layout;
+        return sectionsView;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <F> IFieldView<F> appendField(final IBSFormGroupLayout layout, final RecordModel<? extends IRecord> record, IField<F> field) {
+    private <F> IFieldView<F> appendField(final IBSFormGroupLayout layout, final RecordModel<? extends IRecord> record, IField<F> field, SerializableConsumer<BSFormGroup> groupConfigurer) {
         return getAppender(field)
-            .append(layout, record, field);
+            .append(new FieldComponentContext<>(layout, record, field, groupConfigurer));
     }
 
     @SuppressWarnings("unchecked")
