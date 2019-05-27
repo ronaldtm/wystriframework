@@ -1,5 +1,7 @@
 package org.wystriframework.crudgen.annotation;
 
+import static org.apache.commons.lang3.StringUtils.*;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -34,6 +36,12 @@ public class AnnotatedField<E, F> implements IField<F> {
         this.entity = entity;
         this.name = field.getName();
         this.delegate = new AnnotatedFieldDelegate<>();
+    }
+
+    @Override
+    public String getLabel() {
+        final String label = getFieldAnnotation(Field.class).label();
+        return (isNotBlank(label)) ? label : getName();
     }
 
     @Override

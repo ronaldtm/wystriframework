@@ -21,9 +21,8 @@ import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.crudgen.annotation.AnnotatedRecord;
 import org.wystriframework.crudgen.annotation.Bool;
 import org.wystriframework.crudgen.annotation.Field;
-import org.wystriframework.crudgen.annotation.FormLayout;
+import org.wystriframework.crudgen.annotation.FormLayout.BeginRow;
 import org.wystriframework.crudgen.annotation.FormLayout.Cell;
-import org.wystriframework.crudgen.annotation.FormLayout.Row;
 import org.wystriframework.crudgen.view.wicket.CrudgenPanel;
 
 public class CrudgenDemoPage extends WebPage {
@@ -126,24 +125,20 @@ public class CrudgenDemoPage extends WebPage {
         WystriConfiguration.get().getHeaderContributor().renderHead(response);
     }
 
-    @FormLayout({
-        //@formatter:off
-        @Row({ @Cell(value = "name"     , spec = "col-md-8"), @Cell("annonymous") }),
-        @Row({ @Cell(value = "matricula", spec = "col-md-4") }),
-        //@formatter:on
-    })
     public static class Person implements Serializable {
 
         @Field(
             requiredIf = IsNotAnnonymous.class, requiredError = "Campo obrigatório",
             enabledIf = IsNotAnnonymous.class)
+        @BeginRow(cols = 2)
+        @Cell(spec = "col-10")
         public String name;
-
-        @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
-        public int    matricula;
 
         @Field
         boolean       annonymous;
+
+        @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
+        public int    matricula;
 
         public static class IsNotAnnonymous implements SerializablePredicate<Person> {
             @Override

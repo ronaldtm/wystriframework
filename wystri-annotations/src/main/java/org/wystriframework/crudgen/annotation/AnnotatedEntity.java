@@ -3,7 +3,6 @@ package org.wystriframework.crudgen.annotation;
 import java.util.stream.Stream;
 
 import org.wystriframework.core.definition.IEntity;
-import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldLayout;
 
 public class AnnotatedEntity<T> implements IEntity {
@@ -23,7 +22,7 @@ public class AnnotatedEntity<T> implements IEntity {
     }
 
     @Override
-    public Stream<? extends IField<?>> fields() {
+    public Stream<AnnotatedField<T, ?>> fields() {
         return Stream.of(getObjectClass().getDeclaredFields())
             .map(field -> new AnnotatedField<>(this, field));
     }

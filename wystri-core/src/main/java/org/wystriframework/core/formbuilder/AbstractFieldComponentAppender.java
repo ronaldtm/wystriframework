@@ -188,7 +188,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         }
         @Override
         public String getObject() {
-            return WystriConfiguration.get().localizedString(field.getName());
+            return WystriConfiguration.get().localizedString(field.getLabel());
         }
     }
 }

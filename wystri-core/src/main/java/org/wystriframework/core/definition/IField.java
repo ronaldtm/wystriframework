@@ -17,6 +17,9 @@ public interface IField<T> extends Serializable {
     IFieldDelegate<T> getDelegate();
     String requiredError();
 
+    default String getLabel() {
+        return getName();
+    };
 
     @SuppressWarnings("unchecked")
     default <C extends IConstraint<? super T>> Optional<C> getConstraint(Class<C> type) {

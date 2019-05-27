@@ -17,6 +17,8 @@ import org.wystriframework.core.definition.IFieldDelegate;
 @SuppressWarnings("rawtypes")
 public @interface Field {
 
+    String label() default "";
+
     Class<? extends IConstraint<?>>[] constraints() default {};
 
     Bool required() default Bool.UNDEFINED;

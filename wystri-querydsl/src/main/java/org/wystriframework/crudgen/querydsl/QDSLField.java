@@ -39,17 +39,17 @@ public class QDSLField<E, F> implements IField<F> {
     public boolean isRequired(IRecord record) {
         return !entity.getEntityPath().getMetadata(path).isNullable();
     }
-    
+
     @Override
     public String requiredError() {
         return null;
     }
-    
+
     @Override
     public boolean isEnabled(IRecord record) {
         return true;
     }
-    
+
     @Override
     public boolean isVisible(IRecord record) {
         return true;

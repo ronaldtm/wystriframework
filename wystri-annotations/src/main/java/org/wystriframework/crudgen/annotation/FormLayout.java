@@ -26,9 +26,22 @@ public @interface FormLayout {
         Cell[] value();
     }
 
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface BeginRow {
+        int cols() default Integer.MAX_VALUE;
+    }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface EndRow {
+    }
+
+    @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface Cell {
-        String spec() default "col";
-        String value();
+        static String DEFAULT_SPEC = "col";
+        String spec() default DEFAULT_SPEC;
+        String name() default "";
     }
 }
