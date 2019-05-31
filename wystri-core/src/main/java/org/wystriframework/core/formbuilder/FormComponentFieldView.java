@@ -1,0 +1,63 @@
+package org.wystriframework.core.formbuilder;
+
+import java.util.Objects;
+
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.validation.ValidationError;
+import org.wystriframework.core.definition.IField;
+import org.wystriframework.core.definition.IFieldView;
+import org.wystriframework.core.wicket.WystriConfiguration;
+
+public class FormComponentFieldView<T> implements IFieldView<T> {
+    private final FieldComponentContext<T> ctx;
+    public FormComponentFieldView(FieldComponentContext<T> ctx) {
+        this.ctx = ctx;
+    }
+    @Override
+    public IField<T> getField() {
+        return ctx.getField();
+    }
+    @Override
+    public T getValue() {
+        return ctx.getFieldComponent().getModelObject();
+    }
+    @Override
+    public void setValue(T value) {
+        if (!Objects.equals(ctx.getFieldComponent().getModelObject(), value))
+            markDirty();
+        ctx.getFieldComponent().setModelObject(value);
+    }
+    @Override
+    public void setRequired(boolean required) {
+        if (ctx.getFieldComponent().isRequired() != required)
+            markDirty();
+        ctx.getFieldComponent().setRequired(required);
+    }
+    @Override
+    public void setVisible(boolean visible) {
+        if (ctx.getFieldComponent().isVisible() != visible)
+            markDirty();
+        ctx.getFieldComponent().setVisible(visible);
+    }
+    @Override
+    public void setEnabled(boolean enabled) {
+        if (ctx.getFieldComponent().isEnabled() != enabled)
+            markDirty();
+        ctx.getFieldComponent().setEnabled(enabled);
+    }
+    @Override
+    public void error(String msg) {
+        ctx.getFieldComponent().error(new ValidationError(WystriConfiguration.get().localizedString(msg)));
+        markDirty();
+    }
+    @Override
+    public void info(String msg) {
+        ctx.getFieldComponent().info(new ValidationError(WystriConfiguration.get().localizedString(msg)));
+        markDirty();
+    }
+    @Override
+    public void markDirty() {
+        RequestCycle.get().find(AjaxRequestTarget.class).ifPresent(t -> t.add(ctx.getFormGroup()));
+    }
+}

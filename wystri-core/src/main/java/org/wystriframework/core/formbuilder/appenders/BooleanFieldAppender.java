@@ -6,24 +6,25 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.wicket.markup.html.form.AbstractSingleSelectChoice;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.wystriframework.core.definition.IField;
+import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IFormat;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.definition.formats.BooleanFormat;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.core.formbuilder.FieldComponentContext;
+import org.wystriframework.core.formbuilder.FormComponentFieldView;
 import org.wystriframework.core.formbuilder.RecordModel;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
-
-    public static final String PARAM_DISPLAY = "display";
 
     @Override
     protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
@@ -44,21 +45,19 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
 
     @SuppressWarnings("unchecked")
     private FormComponent<Boolean> newBooleanSelectField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
-        field.getMetadata().put(IFormat.class, new BooleanFormat());
-        field.getMetadata().get(IFormat.class);
-        //field.getViewParam(PARAM_DISPLAY);
+        IFormat<Boolean> format = field.getMetadata().getOrDefault(IFormat.class, new BooleanFormat());
         final IChoiceRenderer<Boolean> choiceRenderer = new IChoiceRenderer<Boolean>() {
             @Override
             public Object getDisplayValue(Boolean object) {
-                return null;
+                return format.display(object);
             }
             @Override
             public String getIdValue(Boolean object, int index) {
-                return null;
+                return format.format(object);
             }
             @Override
             public Boolean getObject(String id, IModel<? extends List<? extends Boolean>> choices) {
-                return null;
+                return format.parse(id, choices.getObject());
             }
         };
         return new DropDownChoice<>(field.getName(), record.field(field), new ArrayList<>(asList(true, false)), choiceRenderer) {
@@ -69,6 +68,23 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
                     super.error(WystriConfiguration.get().localizedString(msg));
                 } else {
                     super.reportRequiredError();
+                }
+            }
+            @Override
+            protected String getNullValidDisplayValue() {
+                return format.display(null);
+            }
+        };
+    }
+
+    @Override
+    protected IFieldView<Boolean> newFieldView(FieldComponentContext<Boolean> ctx) {
+        return new FormComponentFieldView<>(ctx) {
+            @Override
+            public void setRequired(boolean required) {
+                super.setRequired(required);
+                if (ctx.getFieldComponent() instanceof AbstractSingleSelectChoice<?>) {
+                    ((AbstractSingleSelectChoice<?>) ctx.getFieldComponent()).setNullValid(!required);
                 }
             }
         };

@@ -27,23 +27,23 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
     }
 
     @SuppressWarnings("unchecked")
-    private void processRequired(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected void processRequired(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
         AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
         view.setRequired(afield.isRequired(arecord));
     }
 
     @SuppressWarnings("unchecked")
-    private static <E, F> void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected static <E, F> void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
         view.setVisible(processPredicate(arecord, field.visibleIf(), true));
     }
 
     @SuppressWarnings("unchecked")
-    private static <E, F> void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected static <E, F> void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
         view.setEnabled(processPredicate(arecord, field.enabledIf(), true));
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private static <E> boolean processPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
+    protected static <E> boolean processPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
         if (!Modifier.isAbstract(predicateClass.getModifiers())) {
             Type[] argTypes = ReflectionUtils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
             if (argTypes[0] == AnnotatedRecord.class) {

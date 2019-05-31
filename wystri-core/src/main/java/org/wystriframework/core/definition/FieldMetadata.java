@@ -13,6 +13,11 @@ public class FieldMetadata implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
+    public <T extends Serializable> T getOrDefault(Class<T> key, T defaultValue) {
+        return (T) registry.getOrDefault(key, defaultValue);
+    }
+    
+    @SuppressWarnings("unchecked")
     public <T extends Serializable> FieldMetadata put(Class<T> key, T obj) {
         registry.put(key, obj);
         return this;

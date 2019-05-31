@@ -2,7 +2,6 @@ package org.wystriframework.core.formbuilder;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -11,7 +10,6 @@ import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
 import org.apache.wicket.validation.ValidationError;
@@ -46,7 +44,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         final FormComponent<T> fieldComponent = ctx.getFieldComponent();
         final IField<T> field = ctx.getField();
 
-        final IFieldView<T> fieldView = new FieldViewImpl<>(ctx);
+        final IFieldView<T> fieldView = newFieldView(ctx);
         EntityFormProcessor.associateView(fieldComponent, fieldView);
 
         fieldComponent
@@ -64,6 +62,10 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         return fieldView;
     }
 
+    protected IFieldView<T> newFieldView(FieldComponentContext<T> ctx) {
+        return new FormComponentFieldView<>(ctx);
+    }
+
     @SuppressWarnings("unchecked")
     protected void addAjaxUpdateBehavior(FormComponent<T> fieldComponent, SerializableConsumer<AjaxRequestTarget> onSuccess, SerializableConsumer<AjaxRequestTarget> onError) {
         fieldComponent.add(new AjaxFormComponentUpdatingBehavior("change") {
@@ -76,59 +78,6 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
                 onError.accept(target);
             }
         });
-    }
-
-    protected static class FieldViewImpl<T> implements IFieldView<T> {
-        private final FieldComponentContext<T> ctx;
-        protected FieldViewImpl(FieldComponentContext<T> ctx) {
-            this.ctx = ctx;
-        }
-        @Override
-        public IField<T> getField() {
-            return ctx.getField();
-        }
-        @Override
-        public T getValue() {
-            return ctx.getFieldComponent().getModelObject();
-        }
-        @Override
-        public void setValue(T value) {
-            if (!Objects.equals(ctx.getFieldComponent().getModelObject(), value))
-                markDirty();
-            ctx.getFieldComponent().setModelObject(value);
-        }
-        @Override
-        public void setRequired(boolean required) {
-            if (ctx.getFieldComponent().isRequired() != required)
-                markDirty();
-            ctx.getFieldComponent().setRequired(required);
-        }
-        @Override
-        public void setVisible(boolean visible) {
-            if (ctx.getFieldComponent().isVisible() != visible)
-                markDirty();
-            ctx.getFieldComponent().setVisible(visible);
-        }
-        @Override
-        public void setEnabled(boolean enabled) {
-            if (ctx.getFieldComponent().isEnabled() != enabled)
-                markDirty();
-            ctx.getFieldComponent().setEnabled(enabled);
-        }
-        @Override
-        public void error(String msg) {
-            ctx.getFieldComponent().error(new ValidationError(WystriConfiguration.get().localizedString(msg)));
-            markDirty();
-        }
-        @Override
-        public void info(String msg) {
-            ctx.getFieldComponent().info(new ValidationError(WystriConfiguration.get().localizedString(msg)));
-            markDirty();
-        }
-        @Override
-        public void markDirty() {
-            RequestCycle.get().find(AjaxRequestTarget.class).ifPresent(t -> t.add(ctx.getFormGroup()));
-        }
     }
 
     private class OnAfterProcessedBehavior extends Behavior {

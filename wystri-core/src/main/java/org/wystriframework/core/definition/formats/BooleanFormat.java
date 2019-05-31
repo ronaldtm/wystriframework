@@ -25,9 +25,10 @@ public class BooleanFormat implements IFormat<Boolean> {
     }
     @Override
     public Boolean parse(String s) {
-        return TRUE_VALUE.equalsIgnoreCase(s) ? true
-            : (FALSE_VALUE.equalsIgnoreCase(s)) ? false
-                : null;
+        return (s == null) ? null
+            : TRUE_VALUE.equalsIgnoreCase(s) ? true
+                : (FALSE_VALUE.equalsIgnoreCase(s)) ? false
+                    : null;
     }
     @Override
     public String format(Boolean v) {

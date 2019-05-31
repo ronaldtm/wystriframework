@@ -14,6 +14,8 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IFileRef;
+import org.wystriframework.core.definition.IFormat;
+import org.wystriframework.core.definition.formats.BooleanFormat;
 import org.wystriframework.core.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
@@ -150,7 +152,7 @@ public class CrudgenDemoPage extends WebPage {
         public int      matricula;
 
         @Field(label = "Situação")
-        @CustomView()
+        @CustomView(format = BooleanFormat.class, formatArgs = { "Yep", "Nope", "Meh" })
         public Boolean  situacao;
 
         @Action(type = ActionType.PRIMARY)
@@ -168,6 +170,21 @@ public class CrudgenDemoPage extends WebPage {
             @Override
             public boolean test(Person t) {
                 return !t.annonymous;
+            }
+        }
+
+        public static class SituacaoFormat implements IFormat<Boolean> {
+            @Override
+            public Boolean parse(String s) {
+                return Boolean.parseBoolean(s);
+            }
+            @Override
+            public String format(Boolean v) {
+                return v.toString();
+            }
+            @Override
+            public String display(Boolean v) {
+                return v ? "Ativo" : "Inativo";
             }
         }
     }

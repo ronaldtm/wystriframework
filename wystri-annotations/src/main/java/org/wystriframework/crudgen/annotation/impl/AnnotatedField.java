@@ -22,7 +22,9 @@ import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
+import org.wystriframework.core.definition.IFormat;
 import org.wystriframework.core.definition.IRecord;
+import org.wystriframework.core.formbuilder.IFieldComponentAppender;
 import org.wystriframework.core.util.IBeanLookup;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.crudgen.annotation.Constraint;
@@ -140,11 +142,17 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     @Override
     public FieldMetadata getMetadata() {
+        FieldMetadata metadata = new FieldMetadata();
+
         CustomView view = getFieldAnnotation(CustomView.class);
-        if (!Modifier.isAbstract(view.appender().getModifiers())) {
-            lookup().newInstance(view.appender(), view.appenderArgs());
-        }
-        return new FieldMetadata();
+
+        if (!Modifier.isAbstract(view.appender().getModifiers()))
+            metadata.put(IFieldComponentAppender.class, lookup().newInstance(view.appender(), view.appenderArgs()));
+
+        if (!Modifier.isAbstract(view.format().getModifiers()))
+            metadata.put(IFormat.class, lookup().newInstance(view.format(), view.formatArgs()));
+
+        return metadata;
     }
 
     @Override
