@@ -5,6 +5,8 @@ import java.util.Map;
 
 public interface IConstrainable<T> {
 
+    Class<T> getType();
+    
     T getValue();
 
     boolean hasError();

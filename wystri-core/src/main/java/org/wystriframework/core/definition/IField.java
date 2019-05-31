@@ -8,11 +8,11 @@ public interface IField<T> extends Serializable {
 
     IEntity getEntity();
     String getName();
-    Class<? extends T> getType();
+    Class<T> getType();
     boolean isRequired(IRecord record);
     boolean isEnabled(IRecord record);
     boolean isVisible(IRecord record);
-    List<IConstraint<? super T>> getConstraints();
+    List<IConstraint<? super T>> getConstraints(IRecord record);
     FieldMetadata getMetadata();
     IFieldDelegate<T> getDelegate();
     String requiredError();
@@ -22,8 +22,8 @@ public interface IField<T> extends Serializable {
     };
 
     @SuppressWarnings("unchecked")
-    default <C extends IConstraint<? super T>> Optional<C> getConstraint(Class<C> type) {
-        final Optional<C> exact = getConstraints().stream()
+    default <C extends IConstraint<? super T>> Optional<C> getConstraint(IRecord record, Class<C> type) {
+        final Optional<C> exact = getConstraints(record).stream()
             .filter(it -> type == it.getClass())
             .map(it -> (C) it)
             .findFirst();
@@ -31,7 +31,7 @@ public interface IField<T> extends Serializable {
         if (exact.isPresent())
             return exact;
 
-        final Optional<C> subclass = getConstraints().stream()
+        final Optional<C> subclass = getConstraints(record).stream()
             .filter(it -> type.isAssignableFrom(it.getClass()))
             .map(it -> (C) it)
             .findFirst();

@@ -1,5 +1,6 @@
 package org.wystriframework.core.formbuilder;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -23,8 +24,6 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
-
-import com.google.common.collect.ImmutableMap;
 
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
@@ -52,7 +51,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
 
         fieldComponent
             .setLabel(new LabelModel<>(field))
-            .add(new ConstraintValidator<>(field))
+            .add(new ConstraintValidator<>(ctx, field))
             .add(BSValidationStatusBehavior.getInstance())
             .add(new OnAfterProcessedBehavior(field, fieldView, ctx.getRecord()));
 
@@ -150,8 +149,10 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
     }
 
     private static class ConstraintValidator<T> implements IValidator<T> {
-        private final IField<T> field;
-        protected ConstraintValidator(IField<T> field) {
+        private final FieldComponentContext<T> ctx;
+        private final IField<T>                field;
+        protected ConstraintValidator(FieldComponentContext<T> ctx, IField<T> field) {
+            this.ctx = ctx;
             this.field = field;
         }
         @Override
@@ -159,12 +160,12 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         public void validate(IValidatable<T> validatable) {
             final ValidatableConstrainable<T> constrainable = new ValidatableConstrainable<T>(field, validatable);
 
-            for (IConstraint<?> constraint : field.getConstraints())
+            for (IConstraint<?> constraint : field.getConstraints(ctx.getRecord().getObject()))
                 constraint.check((IConstrainable) constrainable);
         }
     }
 
-    protected static class ValidatableConstrainable<T> implements IConstrainable<Object> {
+    protected static class ValidatableConstrainable<T> implements IConstrainable<T> {
         private final IField<T>       field;
         private final IValidatable<T> validatable;
         protected ValidatableConstrainable(IField<T> field, IValidatable<T> validatable) {
@@ -172,7 +173,11 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
             this.validatable = validatable;
         }
         @Override
-        public Object getValue() {
+        public Class<T> getType() {
+            return field.getType();
+        }
+        @Override
+        public T getValue() {
             return validatable.getValue();
         }
         @Override
@@ -182,7 +187,14 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         @Override
         public void error(String key, Map<String, Object> args) {
             validatable.getModel();
-            IModel<? extends Map<String, Object>> argsModel = Model.of(ImmutableMap.copyOf(args));
+
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("label", field.getLabel());
+            map.put("field", field.getName());
+            map.put("value", validatable.getValue());
+            map.putAll(args);
+
+            IModel<? extends Map<String, Object>> argsModel = Model.of(map);
             validatable.error(new ValidationError(WystriConfiguration.get().localizedString(key, argsModel))
                 .setVariables(args));
         }

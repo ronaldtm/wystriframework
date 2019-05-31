@@ -1,6 +1,7 @@
 package org.wystriframework.crudgen.annotation.impl;
 
 import static java.util.Arrays.*;
+import static java.util.stream.Collectors.*;
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.wystriframework.core.util.ReflectionUtils.*;
 
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.wicket.core.util.lang.PropertyResolver;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.FieldMetadata;
+import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
@@ -23,6 +26,7 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.util.IBeanLookup;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.crudgen.annotation.Constraint;
+import org.wystriframework.crudgen.annotation.ConstraintFor;
 import org.wystriframework.crudgen.annotation.CustomView;
 import org.wystriframework.crudgen.annotation.Field;
 
@@ -79,8 +83,15 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
+    public List<IConstraint<? super F>> getConstraints(IRecord record) {
+        List<IConstraint<? super F>> constraints = new ArrayList<>();
+        constraints.addAll(resolveMethodConstraints(record));
+        constraints.addAll(resolveAnnotationConstraints());
+        return constraints;
+    }
+
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<IConstraint<? super F>> getConstraints() {
+    private List<IConstraint<? super F>> resolveAnnotationConstraints() {
         List<IConstraint<? super F>> constraints = new ArrayList<>();
         List<Annotation> annotations = getAnnotatedAnnotations(getDeclaredField(), Constraint.class);
         for (Annotation annotation : annotations) {
@@ -115,6 +126,18 @@ public class AnnotatedField<E, F> implements IField<F> {
         return constraints;
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private List<IConstraint<? super F>> resolveMethodConstraints(IRecord record) {
+        final List<IConstraint<? super F>> constraints = new ArrayList<>();
+        final List<Pair<String, Class<?>[]>> constraintMethodSpecs = getAnnotatedMethods(entity.getObjectClass(), ConstraintFor.class).stream()
+            .map(it -> Pair.of(it.getName(), it.getParameterTypes()))
+            .collect(toList());
+        for (Pair<String, Class<?>[]> methodSpec : constraintMethodSpecs) {
+            constraints.add(new MethodConstraint(this, record, methodSpec));
+        }
+        return constraints;
+    }
+
     @Override
     public FieldMetadata getMetadata() {
         CustomView view = getFieldAnnotation(CustomView.class);
@@ -142,7 +165,7 @@ public class AnnotatedField<E, F> implements IField<F> {
                 return predicate.test(arecord);
             } else {
                 SerializablePredicate<E> predicate = lookup().byType(predicateClass);
-                return predicate.test(arecord.getObject());
+                return predicate.test(arecord.getTargetObject());
             }
         }
         return defaultValue;
@@ -159,8 +182,8 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Class<? extends F> getType() {
-        return (Class<? extends F>) getDeclaredField().getType();
+    public Class<F> getType() {
+        return (Class<F>) getDeclaredField().getType();
     }
 
     private java.lang.reflect.Field getDeclaredField() {
@@ -179,4 +202,49 @@ public class AnnotatedField<E, F> implements IField<F> {
     public void setValue(E object, F value) {
         PropertyResolver.setValue(getName(), object, value, null);
     }
+
+    protected static final class MethodConstraint<F> implements IConstraint<F> {
+        private final AnnotatedField<?, F>     field;
+        private final IRecord                  record;
+        private final Pair<String, Class<?>[]> methodSpec;
+        protected MethodConstraint(AnnotatedField<?, F> field, IRecord record, Pair<String, Class<?>[]> methodSpec) {
+            this.field = field;
+            this.record = record;
+            this.methodSpec = methodSpec;
+        }
+        @Override
+        public void check(IConstrainable<F> c) {
+            final Class<?>[] argTypes = methodSpec.getValue();
+            Method method;
+            try {
+                method = field.getEntity().getObjectClass().getMethod(methodSpec.getKey(), argTypes);
+            } catch (NoSuchMethodException | SecurityException ex) {
+                throw new RuntimeException(ex.getMessage(), ex);
+            }
+            final ConstraintFor constraintFor = method.getAnnotation(ConstraintFor.class);
+            final String targetFieldName = constraintFor.value();
+
+            if (targetFieldName.equals(field.getName())) {
+                Object[] args = new Object[argTypes.length];
+                for (int i = 0; i < args.length; i++) {
+                    if (IConstrainable.class.isAssignableFrom(argTypes[i])) {
+                        args[i] = c;
+                    } else {
+                        throw new IllegalArgumentException("Unsupported argument type in constraint method: " + argTypes[i]);
+                    }
+                }
+                Object result;
+                try {
+                    result = (Modifier.isStatic(method.getModifiers()))
+                        ? method.invoke(null, args)
+                        : method.invoke(record.getTargetObject(), args);
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    throw new RuntimeException(ex.getMessage(), ex);
+                }
+                if (result instanceof String)
+                    c.error((String) result);
+            }
+        }
+    }
+
 }

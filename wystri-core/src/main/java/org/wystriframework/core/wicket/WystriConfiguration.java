@@ -24,7 +24,6 @@ import com.samskivert.mustache.Template;
 
 public class WystriConfiguration {
 
-    //    private static final MetaDataKey<Map<String, List>>
     private static final WystriConfiguration INSTANCE        = new WystriConfiguration();
 
     private String                           bootstrapCssUrl = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css";
@@ -54,7 +53,10 @@ public class WystriConfiguration {
     }
     public String localizedString(String key, IModel<? extends Map<String, Object>> model) {
         String templateString = Application.get().getResourceSettings().getLocalizer().getString(key, null, model, key);
-        Template template = Mustache.compiler().compile(templateString);
+        Template template = Mustache.compiler()
+            .emptyStringIsFalse(true)
+            .defaultValue("[]")
+            .compile(templateString);
         return template.execute(model.getObject());
     }
 

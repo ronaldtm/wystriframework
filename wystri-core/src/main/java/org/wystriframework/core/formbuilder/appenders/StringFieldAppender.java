@@ -21,7 +21,7 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
     @Override
     protected FormComponent<String> newFormComponent(FieldComponentContext<String> ctx) {
         final IField<String> stringField = (IField<String>) ctx.getField();
-        final Optional<LengthConstraint> maxLength = stringField.getConstraint(LengthConstraint.class);
+        final Optional<LengthConstraint> maxLength = stringField.getConstraint(ctx.getRecord().getObject(), LengthConstraint.class);
 
         return (maxLength.isPresent() && maxLength.get().getMax() > 255)
             ? newLongStringField(ctx.getRecord(), (IField<String>) ctx.getField())

@@ -6,6 +6,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -77,6 +78,16 @@ public abstract class ReflectionUtils {
                 return subAnnotation;
         }
         return null;
+    }
+
+    public static <A extends Annotation> List<Method> getAnnotatedMethods(Class<?> type, Class<A> annotationClass) {
+        final List<Method> list = new ArrayList<>();
+        for (Method method : type.getDeclaredMethods()) {
+            final A annotation = method.getAnnotation(annotationClass);
+            if (annotation != null)
+                list.add(method);
+        }
+        return list;
     }
 
     public static List<Annotation> getAnnotatedAnnotations(AccessibleObject member, Class<? extends Annotation> metaAnnotationClass) {

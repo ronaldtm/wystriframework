@@ -51,7 +51,7 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
                 return predicate.test(arecord);
             } else {
                 SerializablePredicate<E> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
-                return predicate.test(arecord.getObject());
+                return predicate.test(arecord.getTargetObject());
             }
         }
         return defaultValue;

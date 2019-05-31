@@ -12,6 +12,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
+import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.core.wicket.WystriConfiguration;
@@ -19,9 +20,11 @@ import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
 import org.wystriframework.core.wicket.bootstrap.BSCustomFile;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.crudgen.annotation.Action;
+import org.wystriframework.crudgen.annotation.ConstraintFor;
 import org.wystriframework.crudgen.annotation.CustomView;
 import org.wystriframework.crudgen.annotation.Field;
 import org.wystriframework.crudgen.annotation.constraints.Length;
+import org.wystriframework.crudgen.annotation.constraints.Range;
 import org.wystriframework.crudgen.annotation.impl.ActionType;
 import org.wystriframework.crudgen.annotation.impl.AnnotatedRecord;
 import org.wystriframework.crudgen.annotation.impl.Bool;
@@ -133,7 +136,7 @@ public class CrudgenDemoPage extends WebPage {
         @Field(
             requiredIf = IsNotAnnonymous.class, requiredError = "Campo obrigatório",
             enabledIf = IsNotAnnonymous.class)
-        @Length(min=10, max = 40)
+        @Length(min = 10, max = 40)
         public String   name;
 
         @Field
@@ -143,6 +146,7 @@ public class CrudgenDemoPage extends WebPage {
         public IFileRef profilePhoto;
 
         @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
+        @Range(rangeExpression = "[1..99999]")
         public int      matricula;
 
         @Field(label = "Situação")
@@ -152,6 +156,12 @@ public class CrudgenDemoPage extends WebPage {
         @Action(type = ActionType.PRIMARY)
         public void executar() {
 
+        }
+
+        @ConstraintFor("matricula")
+        public void validateMatricula(IConstrainable<Integer> c) {
+            if (c.getValue() % 2 == 0)
+                c.error("A matrícula deve ser ímpar: " + c.getValue());
         }
 
         public static class IsNotAnnonymous implements SerializablePredicate<Person> {

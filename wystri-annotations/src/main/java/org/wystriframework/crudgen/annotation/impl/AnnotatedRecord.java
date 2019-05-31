@@ -19,12 +19,13 @@ public class AnnotatedRecord<E> implements IRecord {
     }
 
     @Override
-    public AnnotatedEntity<E> getEntity() {
-        return entity;
+    public E getTargetObject() {
+        return object;
     }
 
-    public E getObject() {
-        return object;
+    @Override
+    public AnnotatedEntity<E> getEntity() {
+        return entity;
     }
 
     @Override

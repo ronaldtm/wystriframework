@@ -56,7 +56,7 @@ public class QDSLField<E, F> implements IField<F> {
     }
 
     @Override
-    public List<IConstraint<? super F>> getConstraints() {
+    public List<IConstraint<? super F>> getConstraints(IRecord record) {
         return constraints;
     }
 
@@ -102,8 +102,9 @@ public class QDSLField<E, F> implements IField<F> {
     //@formatter:on
 
     @Override
-    public Class<? extends F> getType() {
-        return path.getType();
+    @SuppressWarnings("unchecked")
+    public Class<F> getType() {
+        return (Class<F>) path.getType();
     }
 
     private String resolveName(ColumnMetadata cmeta) {
