@@ -9,6 +9,7 @@ import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.IValidator;
@@ -22,6 +23,8 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
+
+import com.google.common.collect.ImmutableMap;
 
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
@@ -154,7 +157,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         @Override
         @SuppressWarnings({ "unchecked", "rawtypes" })
         public void validate(IValidatable<T> validatable) {
-            final ValidatableConstrainable<T> constrainable = new ValidatableConstrainable<T>(validatable);
+            final ValidatableConstrainable<T> constrainable = new ValidatableConstrainable<T>(field, validatable);
 
             for (IConstraint<?> constraint : field.getConstraints())
                 constraint.check((IConstrainable) constrainable);
@@ -162,8 +165,10 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
     }
 
     protected static class ValidatableConstrainable<T> implements IConstrainable<Object> {
+        private final IField<T>       field;
         private final IValidatable<T> validatable;
-        protected ValidatableConstrainable(IValidatable<T> validatable) {
+        protected ValidatableConstrainable(IField<T> field, IValidatable<T> validatable) {
+            this.field = field;
             this.validatable = validatable;
         }
         @Override
@@ -176,7 +181,9 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         }
         @Override
         public void error(String key, Map<String, Object> args) {
-            validatable.error(new ValidationError(WystriConfiguration.get().localizedString(key))
+            validatable.getModel();
+            IModel<? extends Map<String, Object>> argsModel = Model.of(ImmutableMap.copyOf(args));
+            validatable.error(new ValidationError(WystriConfiguration.get().localizedString(key, argsModel))
                 .setVariables(args));
         }
     }

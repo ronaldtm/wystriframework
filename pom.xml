@@ -22,6 +22,8 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <servlet-api.version>3.1.0</servlet-api.version>
+    <javax-inject.version>1</javax-inject.version>
     <wicket.version>8.4.0</wicket.version>
     <spring.version>5.1.6.RELEASE</spring.version>
     <jetty9.version>9.4.15.v20190215</jetty9.version>
@@ -31,6 +33,7 @@
     <!-- allowed values: R7, 1.0, 1.5, 2.0 or none -->
     <wtp.version>none</wtp.version>
   </properties>
+
   <dependencyManagement>
     <dependencies>
       <!--  WICKET DEPENDENCIES -->
@@ -76,10 +79,30 @@
       </dependency>
 
       <!-- MISC DEPENDENCIES -->
+
+      <dependency>
+        <groupId>javax.inject</groupId>
+        <artifactId>javax.inject</artifactId>
+        <version>${javax-inject.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>${servlet-api.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.7</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-beanutils</groupId>
+        <artifactId>commons-beanutils</artifactId>
+        <version>1.9.3</version>
       </dependency>
 <!--
       <dependency>

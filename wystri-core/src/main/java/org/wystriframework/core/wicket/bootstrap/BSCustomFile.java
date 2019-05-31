@@ -1,13 +1,21 @@
 package org.wystriframework.core.wicket.bootstrap;
 
+import static java.util.Arrays.*;
+import static java.util.stream.Collectors.*;
 import static org.wystriframework.core.wicket.component.jquery.JQuery.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import org.apache.commons.fileupload.FileItem;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
@@ -15,6 +23,7 @@ import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
 import org.apache.wicket.ajax.form.AjaxFormSubmitBehavior;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -23,16 +32,15 @@ import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.link.AbstractLink;
-import org.apache.wicket.markup.html.link.ResourceLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.request.resource.AbstractResource;
-import org.apache.wicket.request.resource.ContentDisposition;
-import org.apache.wicket.util.io.IOUtils;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.lang.Bytes;
-import org.apache.wicket.util.time.Duration;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.filemanager.ITempFileManager;
+import org.wystriframework.core.filemanager.SessionScopedTempFileDownloadResource;
 import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.component.fileupload.CustomDiskFileItem;
 import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
 import org.wystriframework.core.wicket.util.IModelShortcutsMixin;
 
@@ -49,6 +57,7 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     private final AbstractLink         downloadLink;
     private final ClearLink            clearLink;
     private final BSProgressBar        progressBar;
+    private final Set<String>          acceptedFileTypes = new LinkedHashSet<>();
 
     public BSCustomFile(String id) {
         this(id, null);
@@ -60,10 +69,10 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
         form = new Form<>("form");
         form.setMultiPart(true);
 
-        input = new FileUploadField("input", IModelShortcutsMixin.$m.getSet(this::getFileList, this::setFileList));
+        input = new CustomFileUploadField("input", IModelShortcutsMixin.$m.getSet(this::getFileList, this::setFileList));
         uploadBehavior = new UploadBehavior("delayedsubmit");
         linkGroup = new WebMarkupContainer("linkGroup");
-        downloadLink = newDownloadLink("link", new DownloadResource());
+        downloadLink = newDownloadLink("link");
         clearLink = new ClearLink("clear");
         progressBar = new BSProgressBar("progress", form, input);
         inputGroup = new WebMarkupContainer("inputGroup");
@@ -96,8 +105,12 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
             }));
     }
 
-    protected AbstractLink newDownloadLink(String id, DownloadResource downloadResource) {
-        return new ResourceLink<>(id, downloadResource);
+    protected AbstractLink newDownloadLink(String id) {
+        return new ExternalLink(id, IModel.of(() -> {
+            return (getFileRef() != null)
+                ? urlFor(SessionScopedTempFileDownloadResource.getReference(getApplication()), new PageParameters().set("id", getFileRef().getId()))
+                : "";
+        }));
     }
 
     protected void onUploadComplete(AjaxRequestTarget target) {}
@@ -120,6 +133,20 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
             this.setFileRef(getModelObject());
     }
 
+    public BSCustomFile setAcceptedFileTypes(Collection<String> types) {
+        this.acceptedFileTypes.clear();
+        this.acceptedFileTypes.addAll(types);
+        return this;
+    }
+
+    public BSCustomFile setAcceptedFileTypes(String... types) {
+        return setAcceptedFileTypes(asList(types));
+    }
+
+    public Set<String> getAcceptedFileTypes() {
+        return Collections.unmodifiableSet(acceptedFileTypes);
+    }
+
     //@formatter:off
     private List<FileUpload> getFileList() { return fileList; }
     private IFileRef         getFileRef()  { return fileRef ; }
@@ -129,6 +156,18 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     @Override public BSCustomFile setModel      (IModel<IFileRef> model) { return (BSCustomFile) super.setModel      (model ); }
     @Override public BSCustomFile setModelObject(IFileRef        object) { return (BSCustomFile) super.setModelObject(object); }
     //@formatter:on
+
+    protected final class CustomFileUploadField extends FileUploadField {
+        protected CustomFileUploadField(String id, IModel<? extends List<FileUpload>> model) {
+            super(id, model);
+        }
+        @Override
+        protected void onComponentTag(ComponentTag tag) {
+            super.onComponentTag(tag);
+            if (!acceptedFileTypes.isEmpty())
+                tag.put("accept", acceptedFileTypes.stream().collect(joining(",")));
+        }
+    }
 
     protected class UploadBehavior extends AjaxFormSubmitBehavior {
         protected UploadBehavior(String event) {
@@ -158,14 +197,21 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
             if (getFileList() != null && !getFileList().isEmpty()) {
                 final ITempFileManager fileman = WystriConfiguration.get().getTempFileManager();
                 final FileUpload fu = getFileList().get(0);
-                try (final InputStream is = fu.getInputStream()) {
-                    fileRef = fileman.createTempFile(fu.getClientFileName(), is);
+
+                try {
+                    final Optional<File> file = resolveFile(fu);
+                    if (file.isPresent()) {
+                        fileRef = fileman.moveAsTempFile(fu.getClientFileName(), file.get());
+                    } else {
+                        try (InputStream is = fu.getInputStream()) {
+                            fileRef = fileman.createTempFile(fu.getClientFileName(), is);
+                        }
+                    }
 
                     target.add(form);
                     onUploadComplete(target);
 
-                } catch (IOException ex) {
-
+                } catch (SecurityException | IllegalArgumentException | IOException ex) {
                     onUploadError(target, Optional.of(ex));
                     throw new RuntimeException(ex.getMessage(), ex);
                 }
@@ -177,25 +223,19 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
         }
     }
 
-    protected class DownloadResource extends AbstractResource {
-        @Override
-        protected ResourceResponse newResourceResponse(Attributes attributes) {
-            final ResourceResponse resp = new ResourceResponse()
-                .setContentDisposition(ContentDisposition.INLINE)
-                .setCacheDuration(Duration.NONE);
+    private static Optional<File> resolveFile(final FileUpload fu) {
+        try {
+            Field itemField = FileUpload.class.getDeclaredField("item");
+            itemField.setAccessible(true);
+            final FileItem fileItem = (FileItem) itemField.get(fu);
 
-            return resp
-                .setFileName(getFileRef().getName())
-                .setContentLength(getFileRef().getSize())
-                .setContentType(getFileRef().getMimeType())
-                .setWriteCallback(new WriteCallback() {
-                    @Override
-                    public void writeData(Attributes attributes) throws IOException {
-                        try (OutputStream output = attributes.getResponse().getOutputStream(); InputStream input = getFileRef().openStream();) {
-                            IOUtils.copy(input, output);
-                        }
-                    }
-                });
+            if (fileItem instanceof CustomDiskFileItem)
+                return Optional.of(((CustomDiskFileItem) fileItem).getTempFile());
+            else
+                return Optional.empty();
+
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            return Optional.empty();
         }
     }
 

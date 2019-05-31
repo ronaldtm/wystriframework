@@ -9,7 +9,7 @@ import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.definition.constraints.MaxLengthConstraint;
+import org.wystriframework.core.definition.constraints.LengthConstraint;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.core.formbuilder.FieldComponentContext;
 import org.wystriframework.core.formbuilder.RecordModel;
@@ -21,9 +21,9 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
     @Override
     protected FormComponent<String> newFormComponent(FieldComponentContext<String> ctx) {
         final IField<String> stringField = (IField<String>) ctx.getField();
-        final Optional<MaxLengthConstraint> maxLength = stringField.getConstraint(MaxLengthConstraint.class);
+        final Optional<LengthConstraint> maxLength = stringField.getConstraint(LengthConstraint.class);
 
-        return (maxLength.isPresent() && maxLength.get().getMaxLength() > 255)
+        return (maxLength.isPresent() && maxLength.get().getMax() > 255)
             ? newLongStringField(ctx.getRecord(), (IField<String>) ctx.getField())
             : newStringField(ctx.getRecord(), (IField<String>) ctx.getField());
     }

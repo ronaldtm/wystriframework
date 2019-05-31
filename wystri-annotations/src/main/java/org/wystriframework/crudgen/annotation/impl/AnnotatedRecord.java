@@ -1,4 +1,4 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;

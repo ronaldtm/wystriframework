@@ -18,11 +18,13 @@ import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
 import org.wystriframework.core.wicket.bootstrap.BSCustomFile;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
-import org.wystriframework.crudgen.annotation.AnnotatedRecord;
-import org.wystriframework.crudgen.annotation.Bool;
+import org.wystriframework.crudgen.annotation.Action;
+import org.wystriframework.crudgen.annotation.CustomView;
 import org.wystriframework.crudgen.annotation.Field;
-import org.wystriframework.crudgen.annotation.FormLayout.BeginRow;
-import org.wystriframework.crudgen.annotation.FormLayout.Cell;
+import org.wystriframework.crudgen.annotation.constraints.Length;
+import org.wystriframework.crudgen.annotation.impl.ActionType;
+import org.wystriframework.crudgen.annotation.impl.AnnotatedRecord;
+import org.wystriframework.crudgen.annotation.impl.Bool;
 import org.wystriframework.crudgen.view.wicket.CrudgenPanel;
 
 public class CrudgenDemoPage extends WebPage {
@@ -35,10 +37,10 @@ public class CrudgenDemoPage extends WebPage {
     public CrudgenDemoPage(final PageParameters parameters) {
         super(parameters);
 
-        final Model<String> nome = new Model<>();
-        final Model<Integer> codigo = new Model<>();
-        final Model<Sexo> sexo = new Model<>();
-        final Model<Boolean> aceite = new Model<>();
+        //        final Model<String> nome = new Model<>();
+        //        final Model<Integer> codigo = new Model<>();
+        //        final Model<Sexo> sexo = new Model<>();
+        //        final Model<Boolean> aceite = new Model<>();
         final IModel<IFileRef> upload = new Model<>();
 
         final BSFormRowLayout layout = new BSFormRowLayout("layout");
@@ -56,10 +58,11 @@ public class CrudgenDemoPage extends WebPage {
 
             .add(layout
 
-            //                .appendFormGroup(fg -> fg
-            //                    .add(fUpload
-            //                        .setLabel(() -> "Upload de arquivo...")))
-            //
+                .appendFormGroup(fg -> fg
+                    .add(fUpload
+                        .setAcceptedFileTypes(".pdf", "image/png")
+                        .setLabel(() -> "Upload de arquivo...")))
+
             //                .appendFormRow(fr -> fr
             //
             //                    .appendFormGroup(fg -> fg
@@ -130,15 +133,26 @@ public class CrudgenDemoPage extends WebPage {
         @Field(
             requiredIf = IsNotAnnonymous.class, requiredError = "Campo obrigatório",
             enabledIf = IsNotAnnonymous.class)
-        @BeginRow(cols = 2)
-        @Cell(spec = "col-10")
-        public String name;
+        @Length(min=10, max = 40)
+        public String   name;
 
         @Field
-        boolean       annonymous;
+        public boolean  annonymous;
+
+        @Field(label = "Foto do perfil")
+        public IFileRef profilePhoto;
 
         @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
-        public int    matricula;
+        public int      matricula;
+
+        @Field(label = "Situação")
+        @CustomView()
+        public Boolean  situacao;
+
+        @Action(type = ActionType.PRIMARY)
+        public void executar() {
+
+        }
 
         public static class IsNotAnnonymous implements SerializablePredicate<Person> {
             @Override

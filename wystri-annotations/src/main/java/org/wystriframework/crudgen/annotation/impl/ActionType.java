@@ -1,4 +1,4 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
 public enum ActionType {
     PRIMARY,

@@ -1,14 +1,18 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
+import static java.util.Arrays.*;
 import static org.apache.commons.lang3.StringUtils.*;
+import static org.wystriframework.core.util.ReflectionUtils.*;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.core.util.lang.PropertyResolver;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.FieldMetadata;
@@ -16,20 +20,21 @@ import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.util.ReflectionUtils;
+import org.wystriframework.core.util.IBeanLookup;
 import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.crudgen.annotation.Constraint;
+import org.wystriframework.crudgen.annotation.CustomView;
+import org.wystriframework.crudgen.annotation.Field;
 
 public class AnnotatedField<E, F> implements IField<F> {
 
-    private final AnnotatedEntity<E>           entity;
-    private final String                       name;
-    private final FieldMetadata                metadata    = new FieldMetadata();
-    private final List<IConstraint<? super F>> constraints = new ArrayList<>();
+    private final AnnotatedEntity<E> entity;
+    private final String             name;
 
-    private final IFieldDelegate<F>            delegate;
+    private final IFieldDelegate<F>  delegate;
 
     public static <E> AnnotatedField<E, ?> newSimpleField(AnnotatedEntity<E> entity, java.lang.reflect.Field field) {
-        return new AnnotatedField<>(entity, field).withDefaultConstraints();
+        return new AnnotatedField<>(entity, field);
     }
 
     public AnnotatedField(AnnotatedEntity<E> entity, java.lang.reflect.Field field) {
@@ -74,13 +79,49 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<IConstraint<? super F>> getConstraints() {
+        List<IConstraint<? super F>> constraints = new ArrayList<>();
+        List<Annotation> annotations = getAnnotatedAnnotations(getDeclaredField(), Constraint.class);
+        for (Annotation annotation : annotations) {
+            Constraint constraint = getMetaAnnotation(annotation, Constraint.class);
+
+            Class<? extends IConstraint> implType = constraint.type();
+            IConstraint<? super F> impl = WystriConfiguration.get().getBeanLookup().byType(implType);
+
+            List<Method> annotationProperties = asList(annotation.getClass().getDeclaredMethods());
+            for (Method annotationProperty : annotationProperties) {
+                final String setterName = "set" + StringUtils.capitalize(annotationProperty.getName());
+                final Class<?>[] argTypes = new Class<?>[] { annotationProperty.getReturnType() };
+
+                try {
+                    Method setter;
+                    try {
+                        setter = impl.getClass().getDeclaredMethod(setterName, argTypes);
+                    } catch (NoSuchMethodException nsmex) {
+                        continue;
+                    }
+                    if (setter != null) {
+                        Object value = annotationProperty.invoke(annotation);
+                        setter.setAccessible(true);
+                        setter.invoke(impl, value);
+                    }
+                } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    throw new IllegalArgumentException(ex.getMessage(), ex);
+                }
+            }
+            constraints.add(impl);
+        }
         return constraints;
     }
 
     @Override
     public FieldMetadata getMetadata() {
-        return this.metadata;
+        CustomView view = getFieldAnnotation(CustomView.class);
+        if (!Modifier.isAbstract(view.appender().getModifiers())) {
+            lookup().newInstance(view.appender(), view.appenderArgs());
+        }
+        return new FieldMetadata();
     }
 
     @Override
@@ -88,48 +129,27 @@ public class AnnotatedField<E, F> implements IField<F> {
         return this.delegate;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public AnnotatedField<E, F> withDefaultConstraints() {
-        //        Field field = getFieldAnnotation();
-        //        if (field != null) {
-        //            final IBeanLookup beanLookup = WystriConfiguration.get().getBeanLookup();
-        //
-        //            final Class<? extends SerializablePredicate> requiredIfClass = field.requiredIf();
-        //            if (!Modifier.isAbstract(requiredIfClass.getModifiers())) {
-        //                SerializablePredicate requiredIf = beanLookup.byType(requiredIfClass);
-        //                requiredIf.test(null);
-        //            }
-
-        //        setConstraints(resolveConstraints()); //
-        //        }
-        return this;
-    }
-
     public <A extends Annotation> A getFieldAnnotation(Class<A> annotationClass) {
-        return getDeclaredField().getAnnotation(annotationClass);
-    }
-
-    public void addConstraint(IConstraint<F> constraint) {
-        this.constraints.add(constraint);
-    }
-    public void setConstraints(Collection<? extends IConstraint<F>> constraints) {
-        this.constraints.clear();
-        this.constraints.addAll(constraints);
+        return resolveAnnotation(getDeclaredField(), annotationClass);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static <E> boolean testPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
         if (!Modifier.isAbstract(predicateClass.getModifiers())) {
-            Type[] argTypes = ReflectionUtils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
+            Type[] argTypes = getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
             if (argTypes[0] == AnnotatedRecord.class) {
-                SerializablePredicate<AnnotatedRecord<E>> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
+                SerializablePredicate<AnnotatedRecord<E>> predicate = lookup().byType(predicateClass);
                 return predicate.test(arecord);
             } else {
-                SerializablePredicate<E> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
+                SerializablePredicate<E> predicate = lookup().byType(predicateClass);
                 return predicate.test(arecord.getObject());
             }
         }
         return defaultValue;
+    }
+
+    private static IBeanLookup lookup() {
+        return WystriConfiguration.get().getBeanLookup();
     }
 
     //@formatter:off

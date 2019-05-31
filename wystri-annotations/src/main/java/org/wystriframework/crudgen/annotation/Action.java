@@ -5,6 +5,7 @@ import java.lang.annotation.Target;
 
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.util.NeverPredicate;
+import org.wystriframework.crudgen.annotation.impl.ActionType;
 
 @Target({
     ElementType.METHOD,
@@ -13,6 +14,10 @@ import org.wystriframework.core.util.NeverPredicate;
 public @interface Action {
 
     ActionType type() default ActionType.SECONDARY;
+
+    String iconSpec() default "";
+
+    boolean transactional() default false;
 
     Class<? extends SerializablePredicate<?>> enabledIf() default NeverPredicate.class;
 

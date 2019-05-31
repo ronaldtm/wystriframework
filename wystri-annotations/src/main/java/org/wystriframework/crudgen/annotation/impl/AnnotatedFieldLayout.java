@@ -1,4 +1,4 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldLayout;
+import org.wystriframework.crudgen.annotation.FormLayout;
 
 public class AnnotatedFieldLayout<E> implements IFieldLayout {
 

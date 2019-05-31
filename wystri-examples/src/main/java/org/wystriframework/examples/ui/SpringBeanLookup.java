@@ -25,4 +25,11 @@ public class SpringBeanLookup implements IBeanLookup {
             return (T) acbf.autowire(type, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
         }
     }
+
+    @Override
+    public void inject(Object bean) {
+        final ServletContext sc = application.getServletContext();
+        final WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
+        ac.getAutowireCapableBeanFactory().autowireBean(bean);
+    }
 }

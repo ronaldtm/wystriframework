@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 public interface IFileRef extends Serializable {
 
+    String getId();
     String getName();
     long getSize();
     String getMimeType();

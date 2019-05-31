@@ -3,13 +3,15 @@ package org.wystriframework.core.formbuilder;
 import static org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin.*;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
-import org.danekja.java.util.function.serializable.SerializableConsumer;
+import org.apache.wicket.util.string.StringValue;
 import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IField;
@@ -21,7 +23,6 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.IntegerFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.StringFieldAppender;
-import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.core.wicket.bootstrap.BSFormSectionListView;
 import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
@@ -44,19 +45,20 @@ public class EntityFormBuilder implements Serializable {
             for (Row row : section.getRows()) {
                 final List<Cell> cells = row.getCells();
                 final IBSFormGroupLayout formRow = layout.newFormRow();
+                Map<String, StringValue> params = new HashMap<>();
                 for (Cell cell : cells) {
-                    appendField(formRow, record, cell.getField(), g -> g.add($b.attrAppend("class", " " + cell.getSpec())));
+                    final String spec = cell.getSpec();
+                    appendField(new FieldComponentContext<>(formRow, record, cell.getField(), params, g -> g.add($b.attrAppend("class", " " + spec))));
                 }
             }
         }
-
         return sectionsView;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <F> IFieldView<F> appendField(final IBSFormGroupLayout layout, final RecordModel<? extends IRecord> record, IField<F> field, SerializableConsumer<BSFormGroup> groupConfigurer) {
-        return getAppender(field)
-            .append(new FieldComponentContext<>(layout, record, field, groupConfigurer));
+    private <F> IFieldView<F> appendField(FieldComponentContext<F> ctx) {
+        return getAppender(ctx.getField())
+            .append(ctx);
     }
 
     @SuppressWarnings("unchecked")
@@ -68,7 +70,7 @@ public class EntityFormBuilder implements Serializable {
         return (IFieldComponentAppender<F>) appenders.getOrDefault(fieldType, DEFAULT_APPENDER).get();
     }
 
-    protected ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> getAppendersMap() {
+    protected static ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> getAppendersMap() {
         ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> appenders = new ConcurrentHashMap<>(ImmutableMap.<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> builder()
             .put(String.class, DEFAULT_APPENDER)
             .put(int.class, IntegerFieldAppender::new)

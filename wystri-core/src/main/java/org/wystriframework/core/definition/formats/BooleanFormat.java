@@ -18,6 +18,11 @@ public class BooleanFormat implements IFormat<Boolean> {
         this.trueDisplay = trueDisplay;
         this.falseDisplay = falseDisplay;
     }
+    public BooleanFormat(String trueDisplay, String falseDisplay, String nullDisplay) {
+        this.trueDisplay = trueDisplay;
+        this.falseDisplay = falseDisplay;
+        this.nullDisplay = nullDisplay;
+    }
     @Override
     public Boolean parse(String s) {
         return TRUE_VALUE.equalsIgnoreCase(s) ? true

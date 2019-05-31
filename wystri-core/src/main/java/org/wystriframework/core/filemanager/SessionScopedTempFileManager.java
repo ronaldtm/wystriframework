@@ -10,9 +10,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.wicket.Application;
 import org.apache.wicket.MetaDataKey;
@@ -43,8 +44,8 @@ public class SessionScopedTempFileManager implements ITempFileManager {
         return tfm;
     }
 
-    private Set<FileEntry> files = new HashSet<>();
-    private Path           baseFolder;
+    private ConcurrentMap<String, FileEntry> files = new ConcurrentHashMap<>();
+    private Path                             baseFolder;
 
     public SessionScopedTempFileManager(String sessionId) {
         try {
@@ -55,8 +56,13 @@ public class SessionScopedTempFileManager implements ITempFileManager {
     }
 
     @Override
+    public IFileRef get(String id) {
+        return files.get(id);
+    }
+
+    @Override
     public void close() throws IOException {
-        for (FileEntry entry : files)
+        for (FileEntry entry : files.values())
             entry.invalidate();
     }
 
@@ -66,17 +72,37 @@ public class SessionScopedTempFileManager implements ITempFileManager {
         try (OutputStream out = Files.newOutputStream(temp, StandardOpenOption.WRITE)) {
             Streams.copy(content, out);
         }
-        return new FileEntry(name, temp.toString());
+        return newFileEntry(name, temp.toString());
+    }
+
+    @Override
+    public IFileRef moveAsTempFile(String name, File content) throws IOException {
+        final Path temp = Files.createTempFile(baseFolder, name + ".", ".tmp");
+        Files.move(content.toPath(), temp, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        return newFileEntry(name, temp.toString());
+    }
+
+    private FileEntry newFileEntry(String name, String path) {
+        final FileEntry fileEntry = new FileEntry(name, path, UUID.randomUUID().toString());
+        files.put(fileEntry.getId(), fileEntry);
+        return fileEntry;
     }
 
     private static class FileEntry implements IFileRef {
 
         private final String name;
         private final String path;
+        private final String uuid;
 
-        FileEntry(String name, String path) {
+        FileEntry(String name, String path, String uuid) {
             this.name = name;
             this.path = path;
+            this.uuid = uuid;
+        }
+
+        @Override
+        public String getId() {
+            return uuid;
         }
 
         @Override
@@ -93,6 +119,7 @@ public class SessionScopedTempFileManager implements ITempFileManager {
         }
         @Override
         public InputStream openStream() throws IOException {
+            System.out.println(getPath());
             return Files.newInputStream(getPath(), StandardOpenOption.READ);
         }
         @Override

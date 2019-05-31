@@ -1,4 +1,4 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -9,6 +9,7 @@ import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.util.ReflectionUtils;
 import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.crudgen.annotation.Field;
 
 public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
 

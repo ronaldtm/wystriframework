@@ -5,16 +5,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.wystriframework.core.definition.IFieldDelegate;
-import org.wystriframework.crudgen.annotation.impl.AnnotatedFieldDelegate;
+import org.wystriframework.core.definition.IConstraint;
 
 @Target({
-    ElementType.FIELD,
     ElementType.ANNOTATION_TYPE
 })
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("rawtypes")
-public @interface FieldDelegate {
+public @interface Constraint {
 
-    Class<? extends IFieldDelegate> delegate() default AnnotatedFieldDelegate.class;
+    Class<? extends IConstraint> type();
+
 }

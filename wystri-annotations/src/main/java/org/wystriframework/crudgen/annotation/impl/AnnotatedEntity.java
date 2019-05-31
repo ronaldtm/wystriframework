@@ -1,9 +1,11 @@
-package org.wystriframework.crudgen.annotation;
+package org.wystriframework.crudgen.annotation.impl;
 
 import java.util.stream.Stream;
 
 import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IFieldLayout;
+import org.wystriframework.core.util.ReflectionUtils;
+import org.wystriframework.crudgen.annotation.Field;
 
 public class AnnotatedEntity<T> implements IEntity {
 
@@ -23,7 +25,8 @@ public class AnnotatedEntity<T> implements IEntity {
 
     @Override
     public Stream<AnnotatedField<T, ?>> fields() {
-        return Stream.of(getObjectClass().getDeclaredFields())
+        return ReflectionUtils.allDeclaredFields(getObjectClass())
+            .filter(field -> ReflectionUtils.isAnnotationPresent(field, Field.class))
             .map(field -> new AnnotatedField<>(this, field));
     }
 

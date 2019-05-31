@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.danekja.java.util.function.serializable.SerializablePredicate;
-import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IFieldDelegate;
+import org.wystriframework.crudgen.annotation.impl.AnnotatedFieldDelegate;
+import org.wystriframework.crudgen.annotation.impl.Bool;
 
 @Target({
     ElementType.FIELD,
@@ -18,8 +19,6 @@ import org.wystriframework.core.definition.IFieldDelegate;
 public @interface Field {
 
     String label() default "";
-
-    Class<? extends IConstraint<?>>[] constraints() default {};
 
     Bool required() default Bool.UNDEFINED;
 

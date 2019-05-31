@@ -23,6 +23,8 @@ import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
+    public static final String PARAM_DISPLAY = "display";
+
     @Override
     protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
         final IField<Boolean> ifield = (IField<Boolean>) ctx.getField();
@@ -44,6 +46,7 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
     private FormComponent<Boolean> newBooleanSelectField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
         field.getMetadata().put(IFormat.class, new BooleanFormat());
         field.getMetadata().get(IFormat.class);
+        //field.getViewParam(PARAM_DISPLAY);
         final IChoiceRenderer<Boolean> choiceRenderer = new IChoiceRenderer<Boolean>() {
             @Override
             public Object getDisplayValue(Boolean object) {
