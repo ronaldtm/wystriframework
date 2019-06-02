@@ -19,8 +19,10 @@ import org.wystriframework.core.definition.IFieldLayout.Cell;
 import org.wystriframework.core.definition.IFieldLayout.Row;
 import org.wystriframework.core.definition.IFieldLayout.Section;
 import org.wystriframework.core.definition.IFieldView;
+import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
+import org.wystriframework.core.formbuilder.appenders.FileUploadFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.IntegerFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.StringFieldAppender;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
@@ -77,6 +79,7 @@ public class EntityFormBuilder implements Serializable {
             .put(Integer.class, IntegerFieldAppender::new)
             .put(boolean.class, BooleanFieldAppender::new)
             .put(Boolean.class, BooleanFieldAppender::new)
+            .put(IFileRef.class, FileUploadFieldAppender::new)
             .build());
         return appenders;
     }

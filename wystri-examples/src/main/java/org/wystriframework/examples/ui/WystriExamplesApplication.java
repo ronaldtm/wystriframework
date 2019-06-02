@@ -9,7 +9,6 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.servlet.MultipartServletWebRequest;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.http.WebRequest;
-import org.apache.wicket.response.filter.AjaxServerAndClientTimeFilter;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,6 @@ public class WystriExamplesApplication extends WebApplication {
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
         getResourceSettings().setThrowExceptionOnMissingResource(false);
         getApplicationSettings().setUploadProgressUpdatesEnabled(true);
-        getRequestCycleSettings().addResponseFilter(new AjaxServerAndClientTimeFilter());
 
         WystriConfiguration.get().setBeanLookup(new SpringBeanLookup(this));
 

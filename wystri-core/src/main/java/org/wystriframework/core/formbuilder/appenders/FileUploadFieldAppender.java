@@ -5,7 +5,7 @@ import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.core.formbuilder.FieldComponentContext;
-import org.wystriframework.core.wicket.bootstrap.BSCustomFile;
+import org.wystriframework.core.wicket.bootstrap.BSCustomFileField;
 
 public class FileUploadFieldAppender extends AbstractFieldComponentAppender<IFileRef> {
 
@@ -13,6 +13,6 @@ public class FileUploadFieldAppender extends AbstractFieldComponentAppender<IFil
     protected FormComponent<IFileRef> newFormComponent(FieldComponentContext<IFileRef> ctx) {
         final IField<IFileRef> field = (IField<IFileRef>) ctx.getField();
 
-        return new BSCustomFile(field.getName(), ctx.getRecord().field(field));
+        return new BSCustomFileField(field.getName(), ctx.getRecord().field(field));
     }
 }

@@ -18,6 +18,8 @@ import org.wystriframework.crudgen.annotation.impl.Bool;
 @SuppressWarnings("rawtypes")
 public @interface Field {
 
+    static String KEEP_VALUE = "###KEEPVALUE###";
+
     String label() default "";
 
     Bool required() default Bool.UNDEFINED;
@@ -26,10 +28,10 @@ public @interface Field {
     String requiredError() default "";
 
     Class<? extends SerializablePredicate> enabledIf() default SerializablePredicate.class;
-    String disabledDefaultValue() default "";
+    String disabledDefaultValue() default KEEP_VALUE;
 
     Class<? extends SerializablePredicate> visibleIf() default SerializablePredicate.class;
-    String invisibleDefaultValue() default "";
+    String invisibleDefaultValue() default KEEP_VALUE;
 
     Class<? extends IFieldDelegate> delegate() default AnnotatedFieldDelegate.class;
 }

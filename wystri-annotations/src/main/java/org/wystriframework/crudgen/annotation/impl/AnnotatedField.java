@@ -116,7 +116,6 @@ public class AnnotatedField<E, F> implements IField<F> {
                     }
                     if (setter != null) {
                         Object value = annotationProperty.invoke(annotation);
-                        setter.setAccessible(true);
                         setter.invoke(impl, value);
                     }
                 } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

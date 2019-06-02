@@ -7,7 +7,6 @@ import static org.wystriframework.core.wicket.component.jquery.JQuery.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -15,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.apache.commons.fileupload.FileItem;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
@@ -41,10 +39,12 @@ import org.wystriframework.core.filemanager.ITempFileManager;
 import org.wystriframework.core.filemanager.SessionScopedTempFileDownloadResource;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.component.fileupload.CustomDiskFileItem;
+import org.wystriframework.core.wicket.component.fileupload.CustomFileUpload;
+import org.wystriframework.core.wicket.component.fileupload.CustomFileUploadField;
 import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
 import org.wystriframework.core.wicket.util.IModelShortcutsMixin;
 
-public class BSCustomFile extends FormComponentPanel<IFileRef> {
+public class BSCustomFileField extends FormComponentPanel<IFileRef> {
 
     private transient List<FileUpload> fileList;
     private IFileRef                   fileRef;
@@ -59,17 +59,17 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     private final BSProgressBar        progressBar;
     private final Set<String>          acceptedFileTypes = new LinkedHashSet<>();
 
-    public BSCustomFile(String id) {
+    public BSCustomFileField(String id) {
         this(id, null);
     }
 
-    public BSCustomFile(String id, IModel<IFileRef> model) {
+    public BSCustomFileField(String id, IModel<IFileRef> model) {
         super(id, model);
 
         form = new Form<>("form");
         form.setMultiPart(true);
 
-        input = new CustomFileUploadField("input", IModelShortcutsMixin.$m.getSet(this::getFileList, this::setFileList));
+        input = new BSCustomFileUploadField("input", IModelShortcutsMixin.$m.getSet(this::getFileList, this::setFileList));
         uploadBehavior = new UploadBehavior("delayedsubmit");
         linkGroup = new WebMarkupContainer("linkGroup");
         downloadLink = newDownloadLink("link");
@@ -133,13 +133,13 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
             this.setFileRef(getModelObject());
     }
 
-    public BSCustomFile setAcceptedFileTypes(Collection<String> types) {
+    public BSCustomFileField setAcceptedFileTypes(Collection<String> types) {
         this.acceptedFileTypes.clear();
         this.acceptedFileTypes.addAll(types);
         return this;
     }
 
-    public BSCustomFile setAcceptedFileTypes(String... types) {
+    public BSCustomFileField setAcceptedFileTypes(String... types) {
         return setAcceptedFileTypes(asList(types));
     }
 
@@ -150,15 +150,15 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
     //@formatter:off
     private List<FileUpload> getFileList() { return fileList; }
     private IFileRef         getFileRef()  { return fileRef ; }
-    private BSCustomFile setFileList(List<FileUpload> fileList) { this.fileList = fileList; return this; }
-    private BSCustomFile setFileRef (IFileRef          fileRef) { this.fileRef  = fileRef ; return this; }
+    private BSCustomFileField setFileList(List<FileUpload> fileList) { this.fileList = fileList; return this; }
+    private BSCustomFileField setFileRef (IFileRef          fileRef) { this.fileRef  = fileRef ; return this; }
     
-    @Override public BSCustomFile setModel      (IModel<IFileRef> model) { return (BSCustomFile) super.setModel      (model ); }
-    @Override public BSCustomFile setModelObject(IFileRef        object) { return (BSCustomFile) super.setModelObject(object); }
+    @Override public BSCustomFileField setModel      (IModel<IFileRef> model) { return (BSCustomFileField) super.setModel      (model ); }
+    @Override public BSCustomFileField setModelObject(IFileRef        object) { return (BSCustomFileField) super.setModelObject(object); }
     //@formatter:on
 
-    protected final class CustomFileUploadField extends FileUploadField {
-        protected CustomFileUploadField(String id, IModel<? extends List<FileUpload>> model) {
+    protected final class BSCustomFileUploadField extends CustomFileUploadField {
+        protected BSCustomFileUploadField(String id, IModel<? extends List<FileUpload>> model) {
             super(id, model);
         }
         @Override
@@ -190,7 +190,7 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
         }
         @Override
         protected void onSubmit(AjaxRequestTarget target) {
-            final IFileRef oldFileRef = BSCustomFile.this.getModelObject();
+            final IFileRef oldFileRef = BSCustomFileField.this.getModelObject();
             if (oldFileRef != null && oldFileRef.isValid())
                 oldFileRef.invalidate();
 
@@ -223,18 +223,16 @@ public class BSCustomFile extends FormComponentPanel<IFileRef> {
         }
     }
 
-    private static Optional<File> resolveFile(final FileUpload fu) {
+    protected Optional<File> resolveFile(final FileUpload fu) {
         try {
-            Field itemField = FileUpload.class.getDeclaredField("item");
-            itemField.setAccessible(true);
-            final FileItem fileItem = (FileItem) itemField.get(fu);
-
-            if (fileItem instanceof CustomDiskFileItem)
-                return Optional.of(((CustomDiskFileItem) fileItem).getTempFile());
-            else
+            if (fu instanceof CustomFileUpload) {
+                CustomFileUpload cfu = (CustomFileUpload) fu;
+                CustomDiskFileItem fileItem = cfu.getItem();
+                return Optional.of(fileItem.getTempFile());
+            } else {
                 return Optional.empty();
-
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
+            }
+        } catch (SecurityException | IllegalArgumentException ex) {
             return Optional.empty();
         }
     }

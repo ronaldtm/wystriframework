@@ -3,6 +3,7 @@ package org.wystriframework.crudgen.annotation.impl;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
+import org.danekja.java.util.function.serializable.SerializableFunction;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IFieldView;
@@ -34,12 +35,23 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
 
     @SuppressWarnings("unchecked")
     protected static <E, F> void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        view.setVisible(processPredicate(arecord, field.visibleIf(), true));
+        boolean visible = processPredicate(arecord, field.visibleIf(), true);
+        if (!visible && !Field.KEEP_VALUE.equals(field.invisibleDefaultValue()))
+            view.setValue(converter(view, field.invisibleDefaultValue()));
+        view.setVisible(visible);
     }
 
     @SuppressWarnings("unchecked")
     protected static <E, F> void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        view.setEnabled(processPredicate(arecord, field.enabledIf(), true));
+        boolean enabled = processPredicate(arecord, field.enabledIf(), true);
+        if (!enabled && !Field.KEEP_VALUE.equals(field.disabledDefaultValue()))
+            view.setValue(converter(view, field.disabledDefaultValue()));
+        view.setEnabled(enabled);
+    }
+
+    private static <F> F converter(IFieldView<F> view, String value) {
+        SerializableFunction<String, ? extends F> converter = WystriConfiguration.get().getConverter(view.getType());
+        return (converter != null) ? converter.apply(value) : null;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

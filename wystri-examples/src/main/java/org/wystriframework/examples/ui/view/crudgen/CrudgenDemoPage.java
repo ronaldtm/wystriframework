@@ -15,11 +15,10 @@ import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.definition.IFormat;
-import org.wystriframework.core.definition.formats.BooleanFormat;
 import org.wystriframework.core.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
-import org.wystriframework.core.wicket.bootstrap.BSCustomFile;
+import org.wystriframework.core.wicket.bootstrap.BSCustomFileField;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.crudgen.annotation.Action;
 import org.wystriframework.crudgen.annotation.ConstraintFor;
@@ -50,7 +49,7 @@ public class CrudgenDemoPage extends WebPage {
 
         final BSFormRowLayout layout = new BSFormRowLayout("layout");
 
-        final BSCustomFile fUpload = new BSCustomFile("upload", upload);
+        final BSCustomFileField fUpload = new BSCustomFileField("upload", upload);
         final BSAlertFeedback feedback = new BSAlertFeedback("feedback");
 
         final Form<?> form = new Form<Void>("form") {};
@@ -137,14 +136,15 @@ public class CrudgenDemoPage extends WebPage {
 
         @Field(
             requiredIf = IsNotAnnonymous.class, requiredError = "Campo obrigatório",
-            enabledIf = IsNotAnnonymous.class)
+            enabledIf = IsNotAnnonymous.class, disabledDefaultValue = "")
         @Length(min = 10, max = 40)
         public String   name;
 
         @Field
         public boolean  annonymous;
 
-        @Field(label = "Foto do perfil")
+        @Field(label = "Foto do perfil",
+            enabledIf = IsNotAnnonymous.class, disabledDefaultValue = "")
         public IFileRef profilePhoto;
 
         @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
@@ -152,7 +152,7 @@ public class CrudgenDemoPage extends WebPage {
         public int      matricula;
 
         @Field(label = "Situação")
-        @CustomView(format = BooleanFormat.class, formatArgs = { "Yep", "Nope", "Meh" })
+        @CustomView(format = SituacaoFormat.class)
         public Boolean  situacao;
 
         @Action(type = ActionType.PRIMARY)
@@ -176,15 +176,15 @@ public class CrudgenDemoPage extends WebPage {
         public static class SituacaoFormat implements IFormat<Boolean> {
             @Override
             public Boolean parse(String s) {
-                return Boolean.parseBoolean(s);
+                return (s == null) ? null : Boolean.parseBoolean(s);
             }
             @Override
             public String format(Boolean v) {
-                return v.toString();
+                return (v == null) ? null : v.toString();
             }
             @Override
             public String display(Boolean v) {
-                return v ? "Ativo" : "Inativo";
+                return (v == null) ? "" : v ? "Ativo" : "Inativo";
             }
         }
     }
