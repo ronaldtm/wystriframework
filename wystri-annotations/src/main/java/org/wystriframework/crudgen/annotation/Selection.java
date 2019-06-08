@@ -5,7 +5,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.wystriframework.core.formbuilder.IFieldComponentAppender;
+import org.wystriframework.core.definition.IOptionsProvider;
 
 @Target({
     ElementType.FIELD,
@@ -13,9 +13,16 @@ import org.wystriframework.core.formbuilder.IFieldComponentAppender;
 })
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("rawtypes")
-public @interface CustomView {
+public @interface Selection {
 
-    Class<? extends IFieldComponentAppender> appender() default IFieldComponentAppender.class;
-    String[] appenderArgs() default {};
+    String[] value() default {};
 
+    Option[] options() default {};
+
+    Class<? extends IOptionsProvider> provider() default IOptionsProvider.class;
+
+    @interface Option {
+        String id() default "";
+        String value();
+    }
 }

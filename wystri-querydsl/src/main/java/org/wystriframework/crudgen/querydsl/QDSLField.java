@@ -6,11 +6,13 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.wystriframework.core.definition.FieldMetadata;
 import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
+import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 
 import com.querydsl.core.types.Path;
@@ -41,7 +43,7 @@ public class QDSLField<E, F> implements IField<F> {
     }
 
     @Override
-    public String requiredError() {
+    public String requiredError(IRecord record) {
         return null;
     }
 
@@ -92,6 +94,11 @@ public class QDSLField<E, F> implements IField<F> {
     public void setConstraints(Collection<? extends IConstraint<F>> constraints) {
         this.constraints.clear();
         this.constraints.addAll(constraints);
+    }
+
+    @Override
+    public Optional<? extends IOptionsProvider<F>> getOptionsProvider() {
+        return Optional.empty();
     }
 
     //@formatter:off

@@ -12,17 +12,21 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.commons.lang3.tuple.Triple;
 import org.apache.wicket.core.util.lang.PropertyResolver;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.FieldMetadata;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConstraint;
+import org.wystriframework.core.definition.IConverter;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldDelegate;
-import org.wystriframework.core.definition.IFormat;
+import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.IFieldComponentAppender;
 import org.wystriframework.core.util.IBeanLookup;
@@ -31,6 +35,8 @@ import org.wystriframework.crudgen.annotation.Constraint;
 import org.wystriframework.crudgen.annotation.ConstraintFor;
 import org.wystriframework.crudgen.annotation.CustomView;
 import org.wystriframework.crudgen.annotation.Field;
+import org.wystriframework.crudgen.annotation.Selection;
+import org.wystriframework.crudgen.annotation.Selection.Option;
 
 public class AnnotatedField<E, F> implements IField<F> {
 
@@ -67,7 +73,7 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
-    public String requiredError() {
+    public String requiredError(IRecord record) {
         final Field field = getFieldAnnotation(Field.class);
         return field.requiredError();
     }
@@ -141,17 +147,102 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     @Override
     public FieldMetadata getMetadata() {
-        FieldMetadata metadata = new FieldMetadata();
+        final FieldMetadata metadata = new FieldMetadata();
 
-        CustomView view = getFieldAnnotation(CustomView.class);
-
-        if (!Modifier.isAbstract(view.appender().getModifiers()))
-            metadata.put(IFieldComponentAppender.class, lookup().newInstance(view.appender(), view.appenderArgs()));
-
-        if (!Modifier.isAbstract(view.format().getModifiers()))
-            metadata.put(IFormat.class, lookup().newInstance(view.format(), view.formatArgs()));
+        final CustomView view = getFieldAnnotation(CustomView.class);
+        if (view != null) {
+            if (!Modifier.isAbstract(view.appender().getModifiers()))
+                metadata.put(IFieldComponentAppender.class, lookup().newInstance(view.appender(), view.appenderArgs()));
+        }
 
         return metadata;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<? extends IOptionsProvider<F>> getOptionsProvider() {
+
+        Selection selection = getFieldAnnotation(Selection.class);
+        if (selection != null) {
+            if (!Modifier.isAbstract(selection.provider().getModifiers())) {
+                return (Optional<? extends IOptionsProvider<F>>) Optional.of(lookup().newInstance(selection.provider(), new String[0]));
+
+            } else if (selection.options().length > 0) {
+                final Class<F> type = this.getType();
+                final IConverter<F> converter = WystriConfiguration.get().getConverter(type);
+
+                List<Triple<String, F, String>> opcoes = new ArrayList<>();
+                for (Option option : selection.options()) {
+                    final String label = option.value();
+                    final String id = (isNotBlank(option.id())) ? option.id() : label;
+                    final F value = (F) converter.stringToObject(id);
+
+                    opcoes.add(Triple.of(id, value, label));
+                }
+                return (Optional<? extends IOptionsProvider<F>>) Optional.of(new IOptionsProvider<F>() {
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public List<F> getOptions(IRecord record) {
+                        return opcoes.stream()
+                            .map(it -> it.getMiddle())
+                            .collect(toList());
+                    }
+                    @Override
+                    public String objectToId(F object) {
+                        return opcoes.stream()
+                            .filter(it -> Objects.equals(it.getMiddle(), object))
+                            .findFirst()
+                            .map(it -> it.getLeft())
+                            .orElse(null);
+                    }
+                    @Override
+                    public F idToObject(String id, List<? extends F> options) {
+                        return opcoes.stream()
+                            .filter(it -> Objects.equals(it.getLeft(), id))
+                            .findFirst()
+                            .map(it -> it.getMiddle())
+                            .orElse(null);
+                    }
+                    @Override
+                    public String objectToDisplay(F object, List<? extends F> options) {
+                        return opcoes.stream()
+                            .filter(it -> Objects.equals(it.getMiddle(), object))
+                            .findFirst()
+                            .map(it -> it.getRight())
+                            .orElse(null);
+                    }
+                });
+
+            } else if (selection.value().length > 0) {
+                final Class<F> type = this.getType();
+                final IConverter<F> converter = WystriConfiguration.get().getConverter(type);
+
+                List<String> opcoes = new ArrayList<>(asList(selection.value()));
+                return (Optional<? extends IOptionsProvider<F>>) Optional.of(new IOptionsProvider<F>() {
+                    @Override
+                    @SuppressWarnings("unchecked")
+                    public List<F> getOptions(IRecord record) {
+                        return opcoes.stream()
+                            .map(it -> converter.stringToObject(it))
+                            .collect(toList());
+                    }
+                    @Override
+                    public String objectToId(F object) {
+                        return converter.objectToString(object);
+                    }
+                    @Override
+                    public F idToObject(String id, List<? extends F> options) {
+                        return converter.stringToObject(id);
+                    }
+                    @Override
+                    public String objectToDisplay(F object, List<? extends F> options) {
+                        return Objects.toString(object, "");
+                    }
+                });
+            }
+        }
+
+        return Optional.empty();
     }
 
     @Override

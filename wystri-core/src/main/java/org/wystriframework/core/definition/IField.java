@@ -15,11 +15,14 @@ public interface IField<T> extends Serializable {
     List<IConstraint<? super T>> getConstraints(IRecord record);
     FieldMetadata getMetadata();
     IFieldDelegate<T> getDelegate();
-    String requiredError();
+    String requiredError(IRecord record);
+    
+    Optional<? extends IOptionsProvider<T>> getOptionsProvider();
 
     default String getLabel() {
         return getName();
     };
+
 
     @SuppressWarnings("unchecked")
     default <C extends IConstraint<? super T>> Optional<C> getConstraint(IRecord record, Class<C> type) {

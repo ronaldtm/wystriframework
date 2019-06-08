@@ -17,7 +17,7 @@ public class IntegerFieldAppender extends AbstractFieldComponentAppender<Integer
         return new TextField<Integer>(field.getName(), ctx.getRecord().field(field), Integer.class) {
             @Override
             protected void reportRequiredError() {
-                final String msg = field.requiredError();
+                final String msg = field.requiredError(ctx.getRecord().getObject());
                 if (isNotBlank(msg)) {
                     super.error(WystriConfiguration.get().localizedString(msg));
                 } else {

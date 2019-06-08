@@ -1,6 +1,9 @@
 package org.wystriframework.examples.ui.view.crudgen;
 
+import static java.util.Arrays.*;
+
 import java.io.Serializable;
+import java.util.List;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
@@ -8,22 +11,22 @@ import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IFileRef;
-import org.wystriframework.core.definition.IFormat;
+import org.wystriframework.core.definition.IOptionsProvider;
+import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.EntityFormProcessorBehavior;
+import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.core.wicket.bootstrap.BSAlertFeedback;
-import org.wystriframework.core.wicket.bootstrap.BSCustomFileField;
-import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.crudgen.annotation.Action;
 import org.wystriframework.crudgen.annotation.ConstraintFor;
 import org.wystriframework.crudgen.annotation.CustomView;
 import org.wystriframework.crudgen.annotation.Field;
+import org.wystriframework.crudgen.annotation.Selection;
 import org.wystriframework.crudgen.annotation.constraints.Length;
 import org.wystriframework.crudgen.annotation.constraints.Range;
 import org.wystriframework.crudgen.annotation.impl.ActionType;
@@ -41,15 +44,6 @@ public class CrudgenDemoPage extends WebPage {
     public CrudgenDemoPage(final PageParameters parameters) {
         super(parameters);
 
-        //        final Model<String> nome = new Model<>();
-        //        final Model<Integer> codigo = new Model<>();
-        //        final Model<Sexo> sexo = new Model<>();
-        //        final Model<Boolean> aceite = new Model<>();
-        final IModel<IFileRef> upload = new Model<>();
-
-        final BSFormRowLayout layout = new BSFormRowLayout("layout");
-
-        final BSCustomFileField fUpload = new BSCustomFileField("upload", upload);
         final BSAlertFeedback feedback = new BSAlertFeedback("feedback");
 
         final Form<?> form = new Form<Void>("form") {};
@@ -59,53 +53,6 @@ public class CrudgenDemoPage extends WebPage {
         add(form
 
             .add(feedback)
-
-            .add(layout
-
-                .appendFormGroup(fg -> fg
-                    .add(fUpload
-                        .setAcceptedFileTypes(".pdf", "image/png")
-                        .setLabel(() -> "Upload de arquivo...")))
-
-            //                .appendFormRow(fr -> fr
-            //
-            //                    .appendFormGroup(fg -> fg
-            //                        .setGroupColSizes(BSColSize.col_2)
-            //                        .add(new TextField<>("codigo", codigo)
-            //                            .setRequired(true)
-            //                            .setLabel(() -> "Código")
-            //                            .add(BSValidationStatusBehavior.getInstance())))
-            //
-            //                    .appendFormGroup(fg -> fg
-            //                        .setGroupColSizes(BSColSize.col_8)
-            //                        .add(new TextField<>("nome", nome)
-            //                            .setRequired(true)
-            //                            .setLabel(() -> "Nome")
-            //                            .add(BSValidationStatusBehavior.getInstance())
-            //                            .add(FeedbackMessageUtils.keepMessage(FeedbackMessage.UNDEFINED, c -> "Mínimo de 10 caracteres")))) //
-            //                )
-            //
-            //                .appendFormRow(row -> row
-            //
-            //                    .appendFormGroup(fg -> fg
-            //                        .setGroupColSizes(BSColSize.col_4)
-            //                        .add(new DropDownChoice<>("sexo", sexo, asList(Sexo.values()))
-            //                            .setRequired(true)
-            //                            .setLabel(() -> "Sexo")
-            //                            .add(BSValidationStatusBehavior.getInstance()))) //
-            //                )
-            //
-            //                .appendFormGroup(fg -> fg.setMode(BSFormGroup.Mode.CHECK)
-            //                    .add(new CheckBox("aceite", aceite)
-            //                        .setRequired(true)
-            //                        .add(v -> {
-            //                            if (!Boolean.TRUE.equals(v.getValue()))
-            //                                v.error(new ValidationError("É necessário aceitar os termos de serviço para prosseguir"));
-            //                        })
-            //                        .setLabel(() -> "Aceito os termos de serviço")
-            //                        .add(BSValidationStatusBehavior.getInstance())))
-
-            )
 
             .add(new CrudgenPanel<>("crud", new Model<>(new AnnotatedRecord<>(new Person()))))
 
@@ -152,8 +99,33 @@ public class CrudgenDemoPage extends WebPage {
         public int      matricula;
 
         @Field(label = "Situação")
-        @CustomView(format = SituacaoFormat.class)
+        @CustomView(appender = BooleanFieldAppender.class, appenderArgs = { "Yep", "Nope", "Wut?" })
         public Boolean  situacao;
+
+        @Field
+        @Selection(options = {
+            @Selection.Option(id = "1", value = "Janeiro"),
+            @Selection.Option(id = "2", value = "Fevereiro"),
+            @Selection.Option(id = "3", value = "Março"),
+            @Selection.Option(id = "4", value = "Abril"),
+            @Selection.Option(id = "5", value = "Maio"),
+            @Selection.Option(id = "6", value = "Junho"),
+            @Selection.Option(id = "7", value = "Julho"),
+            @Selection.Option(id = "8", value = "Agosto"),
+            @Selection.Option(id = "9", value = "Setembro"),
+            @Selection.Option(id = "10", value = "Outubro"),
+            @Selection.Option(id = "11", value = "Novembro"),
+            @Selection.Option(id = "12", value = "Dezembro"),
+        })
+        public Integer  monthOfBirth;
+
+        @Field
+        @Selection({ "M", "F" })
+        public String   sex;
+
+        @Field
+        @Selection(provider = GenderOptionsProvider.class)
+        public String   gender;
 
         @Action(type = ActionType.PRIMARY)
         public void executar() {
@@ -173,18 +145,59 @@ public class CrudgenDemoPage extends WebPage {
             }
         }
 
-        public static class SituacaoFormat implements IFormat<Boolean> {
+        public static class GenderOptionsProvider implements IOptionsProvider<String> {
             @Override
-            public Boolean parse(String s) {
-                return (s == null) ? null : Boolean.parseBoolean(s);
+            public List<String> getOptions(IRecord record) {
+                return asList(
+                    "Male to Female (MtF)",
+                    "Female to Male (FtM)",
+                    "Binary",
+                    "Non",
+                    "Genderfluid",
+                    "Agender",
+                    "Bigender",
+                    "Polygender",
+                    "Neutrois",
+                    "Gender Apathetic",
+                    "Androgyne",
+                    "Intergender",
+                    "Demigender",
+                    "Greygender",
+                    "Aporagender",
+                    "Maverique",
+                    "Novigender",
+                    "Designated gender",
+                    "AFAB",
+                    "AMAB",
+                    "Gender roles",
+                    "Gender Presentation",
+                    "Transitioning",
+                    "Intersex",
+                    "Dyadic",
+                    "Trans Woman",
+                    "Trans Man",
+                    "Trans Feminine",
+                    "Trans Masculine",
+                    "Social Dysphoria",
+                    "Body Dysphoria",
+                    "Butch",
+                    "Femme (Fem)",
+                    "Binarism");
             }
+
             @Override
-            public String format(Boolean v) {
-                return (v == null) ? null : v.toString();
+            public String objectToId(String object) {
+                return object;
             }
+
             @Override
-            public String display(Boolean v) {
-                return (v == null) ? "" : v ? "Ativo" : "Inativo";
+            public String idToObject(String id, List<? extends String> options) {
+                return id;
+            }
+
+            @Override
+            public String objectToDisplay(String object, List<? extends String> options) {
+                return object;
             }
         }
     }

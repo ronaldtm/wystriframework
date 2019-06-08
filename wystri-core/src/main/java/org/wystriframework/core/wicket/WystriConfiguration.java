@@ -4,7 +4,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.wicket.Application;
-import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.IInitializer;
 import org.apache.wicket.ISessionListener;
 import org.apache.wicket.Session;
@@ -12,8 +11,7 @@ import org.apache.wicket.markup.head.CssHeaderItem;
 import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.IHeaderContributor;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.util.convert.IConverter;
-import org.danekja.java.util.function.serializable.SerializableFunction;
+import org.wystriframework.core.definition.IConverter;
 import org.wystriframework.core.filemanager.ITempFileManager;
 import org.wystriframework.core.filemanager.SessionScopedTempFileManager;
 import org.wystriframework.core.util.IBeanLookup;
@@ -44,12 +42,14 @@ public class WystriConfiguration {
         return SessionScopedTempFileManager.get(Session.get());
     }
 
-    public <T> SerializableFunction<String, T> getConverter(Class<T> type) {
+    public <T> IConverter<T> getConverter(Class<T> type) {
         return new ConverterImpl<>(type);
     }
 
     public String localizedString(String key) {
-        return Application.get().getResourceSettings().getLocalizer().getString(key, null, key);
+        return (Application.exists())
+            ? Application.get().getResourceSettings().getLocalizer().getString(key, null, key)
+            : key;
     }
     public String localizedString(String key, IModel<? extends Map<String, Object>> model) {
         String templateString = Application.get().getResourceSettings().getLocalizer().getString(key, null, model, key);
@@ -73,17 +73,24 @@ public class WystriConfiguration {
     public WystriConfiguration setBeanLookup     (IBeanLookup beanLookup) { this.beanLookup      = beanLookup     ; return this; }
     //@formatter:on
 
-    private static final class ConverterImpl<T> implements SerializableFunction<String, T> {
+    private static final class ConverterImpl<T> implements IConverter<T> {
         private final Class<T> type;
         protected ConverterImpl(Class<T> type) {
             this.type = type;
         }
         @Override
-        public T apply(String s) {
-            IConverterLocator converterLocator = Application.get().getConverterLocator();
-            IConverter<T> converter = converterLocator.getConverter(type);
+        public T stringToObject(String s) {
+            org.apache.wicket.IConverterLocator converterLocator = Application.get().getConverterLocator();
+            org.apache.wicket.util.convert.IConverter<T> converter = converterLocator.getConverter(type);
             Locale locale = Session.get().getLocale();
             return converter.convertToObject(s, locale);
+        }
+        @Override
+        public String objectToString(T o) {
+            org.apache.wicket.IConverterLocator converterLocator = Application.get().getConverterLocator();
+            org.apache.wicket.util.convert.IConverter<T> converter = converterLocator.getConverter(type);
+            Locale locale = Session.get().getLocale();
+            return converter.convertToString(o, locale);
         }
     }
 

@@ -33,7 +33,7 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
         return new TextField<String>(field.getName(), record.field(field)) {
             @Override
             protected void reportRequiredError() {
-                final String msg = field.requiredError();
+                final String msg = field.requiredError(record.getObject());
                 if (isNotBlank(msg)) {
                     super.error(WystriConfiguration.get().localizedString(msg));
                 } else {

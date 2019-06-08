@@ -7,63 +7,73 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.markup.html.form.AbstractSingleSelectChoice;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.model.IModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
-import org.wystriframework.core.definition.IFormat;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.definition.formats.BooleanFormat;
 import org.wystriframework.core.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.core.formbuilder.FieldComponentContext;
 import org.wystriframework.core.formbuilder.FormComponentFieldView;
 import org.wystriframework.core.formbuilder.RecordModel;
 import org.wystriframework.core.wicket.WystriConfiguration;
-import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
+    private static final String TRUE_VALUE  = "Y";
+    private static final String FALSE_VALUE = "N";
+
+    private String              trueDisplay;
+    private String              falseDisplay;
+    private String              nullDisplay = "";
+
+    public BooleanFieldAppender() {
+        this(TRUE_VALUE, FALSE_VALUE);
+    }
+    public BooleanFieldAppender(String trueDisplay, String falseDisplay) {
+        this.trueDisplay = trueDisplay;
+        this.falseDisplay = falseDisplay;
+    }
+    public BooleanFieldAppender(String trueDisplay, String falseDisplay, String nullDisplay) {
+        this.trueDisplay = trueDisplay;
+        this.falseDisplay = falseDisplay;
+        this.nullDisplay = nullDisplay;
+    }
+
     @Override
+    @SuppressWarnings("unchecked")
     protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
+
         final IField<Boolean> ifield = (IField<Boolean>) ctx.getField();
+        final RecordModel<? extends IRecord> record = ctx.getRecord();
 
-        if (ctx.getField().getType().isPrimitive()) {
-            ctx.getFormGroup().setMode(BSFormGroup.Mode.CHECK);
-            return newBooleanCheckField(ctx.getRecord(), ifield);
-        } else {
-            return newBooleanSelectField(ctx.getRecord(), ifield);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
-        return new CheckBox(field.getName(), record.field(field));
-    }
-
-    @SuppressWarnings("unchecked")
-    private FormComponent<Boolean> newBooleanSelectField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
-        IFormat<Boolean> format = field.getMetadata().getOrDefault(IFormat.class, new BooleanFormat());
         final IChoiceRenderer<Boolean> choiceRenderer = new IChoiceRenderer<Boolean>() {
             @Override
             public Object getDisplayValue(Boolean object) {
-                return format.display(object);
+                return (Boolean.TRUE.equals(object)) ? trueDisplay
+                    : (Boolean.FALSE.equals(object)) ? falseDisplay
+                        : nullDisplay;
             }
             @Override
             public String getIdValue(Boolean object, int index) {
-                return format.format(object);
+                return (Boolean.TRUE.equals(object)) ? TRUE_VALUE
+                    : (Boolean.FALSE.equals(object)) ? FALSE_VALUE
+                        : null;
             }
             @Override
             public Boolean getObject(String id, IModel<? extends List<? extends Boolean>> choices) {
-                return format.parse(id, choices.getObject());
+                return TRUE_VALUE.equals(id) ? Boolean.TRUE
+                    : FALSE_VALUE.equals(id) ? Boolean.FALSE
+                        : null;
             }
         };
-        return new DropDownChoice<>(field.getName(), record.field(field), new ArrayList<>(asList(true, false)), choiceRenderer) {
+
+        return new DropDownChoice<>(ifield.getName(), record.field(ifield), new ArrayList<>(asList(true, false)), choiceRenderer) {
             @Override
             protected void reportRequiredError() {
-                final String msg = field.requiredError();
+                final String msg = ifield.requiredError(record.getObject());
                 if (isNotBlank(msg)) {
                     super.error(WystriConfiguration.get().localizedString(msg));
                 } else {
@@ -72,7 +82,7 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
             }
             @Override
             protected String getNullValidDisplayValue() {
-                return format.display(null);
+                return nullDisplay;
             }
         };
     }

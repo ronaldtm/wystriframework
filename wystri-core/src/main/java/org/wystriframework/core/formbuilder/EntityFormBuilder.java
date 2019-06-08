@@ -6,12 +6,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.string.StringValue;
+import org.danekja.java.util.function.serializable.SerializableConsumer;
 import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IField;
@@ -20,11 +22,16 @@ import org.wystriframework.core.definition.IFieldLayout.Row;
 import org.wystriframework.core.definition.IFieldLayout.Section;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IFileRef;
+import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.formbuilder.appenders.BooleanFieldAppender;
+import org.wystriframework.core.formbuilder.appenders.CheckboxFieldAppender;
+import org.wystriframework.core.formbuilder.appenders.DropDownFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.FileUploadFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.IntegerFieldAppender;
 import org.wystriframework.core.formbuilder.appenders.StringFieldAppender;
+import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.BSFormRowLayout;
 import org.wystriframework.core.wicket.bootstrap.BSFormSectionListView;
 import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
@@ -49,8 +56,13 @@ public class EntityFormBuilder implements Serializable {
                 final IBSFormGroupLayout formRow = layout.newFormRow();
                 Map<String, StringValue> params = new HashMap<>();
                 for (Cell cell : cells) {
+                    final IField<?> field = cell.getField();
                     final String spec = cell.getSpec();
-                    appendField(new FieldComponentContext<>(formRow, record, cell.getField(), params, g -> g.add($b.attrAppend("class", " " + spec))));
+
+                    final SerializableConsumer<BSFormGroup> groupConfigurer = g -> g.add($b.attrAppend("class", " " + spec));
+                    final FieldComponentContext<?> ctx = new FieldComponentContext<>(formRow, record, field, params, groupConfigurer);
+
+                    appendField(ctx);
                 }
             }
         }
@@ -59,28 +71,41 @@ public class EntityFormBuilder implements Serializable {
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private <F> IFieldView<F> appendField(FieldComponentContext<F> ctx) {
-        return getAppender(ctx.getField())
+        return getAppender(ctx.getField(), DEFAULT_APPENDER)
             .append(ctx);
     }
 
     @SuppressWarnings("unchecked")
-    private <F> IFieldComponentAppender<F> getAppender(IField<F> field) {
-        Class<?> fieldType = field.getType();
+    protected <F> IFieldComponentAppender<F> getAppender(IField<F> field, SerializableSupplier<IFieldComponentAppender<?>> defaultAppender) {
+        final IFieldComponentAppender<F> appender = field.getMetadata().get(IFieldComponentAppender.class);
+        if (appender != null)
+            return appender;
 
-        ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> appenders = getAppendersMap();
-
-        return (IFieldComponentAppender<F>) appenders.getOrDefault(fieldType, DEFAULT_APPENDER).get();
+        return (IFieldComponentAppender<F>) findAppender(field)
+            .orElseGet(defaultAppender);
     }
 
-    protected static ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> getAppendersMap() {
-        ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> appenders = new ConcurrentHashMap<>(ImmutableMap.<Class<?>, SerializableSupplier<IFieldComponentAppender<?>>> builder()
-            .put(String.class, DEFAULT_APPENDER)
-            .put(int.class, IntegerFieldAppender::new)
-            .put(Integer.class, IntegerFieldAppender::new)
-            .put(boolean.class, BooleanFieldAppender::new)
-            .put(Boolean.class, BooleanFieldAppender::new)
-            .put(IFileRef.class, FileUploadFieldAppender::new)
-            .build());
-        return appenders;
+    @SuppressWarnings("rawtypes")
+    private static final ConcurrentMap<Class<?>, SerializableSupplier<IFieldComponentAppender>> appenders = new ConcurrentHashMap<>(ImmutableMap.<Class<?>, SerializableSupplier<IFieldComponentAppender>> builder()
+        .put(String.class, StringFieldAppender::new)
+        .put(int.class, IntegerFieldAppender::new)
+        .put(Integer.class, IntegerFieldAppender::new)
+        .put(boolean.class, CheckboxFieldAppender::new)
+        .put(Boolean.class, BooleanFieldAppender::new)
+        .put(IFileRef.class, FileUploadFieldAppender::new)
+        .build());
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    protected <F> Optional<IFieldComponentAppender<?>> findAppender(IField<F> field) {
+
+        Optional<? extends IOptionsProvider<F>> op = field.getOptionsProvider();
+
+        if (op.isPresent()) {
+            return Optional.of(new DropDownFieldAppender<>());
+        }
+
+        return Optional.ofNullable(appenders.get(field.getType()))
+            .map(it -> it.get())
+            .map(it -> WystriConfiguration.get().getBeanLookup().inject(it));
     }
 }

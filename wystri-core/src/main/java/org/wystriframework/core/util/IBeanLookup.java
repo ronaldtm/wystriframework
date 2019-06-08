@@ -8,7 +8,7 @@ import org.wystriframework.core.wicket.WystriConfiguration;
 public interface IBeanLookup {
 
     <T> T byType(Class<T> type);
-    void inject(Object bean);
+    <T> T inject(T bean);
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
 
@@ -20,7 +20,7 @@ public interface IBeanLookup {
             Class<?>[] argTypes = con.getParameterTypes();
             Object[] convertedArgs = new Object[args.length];
             for (int i = 0; i < args.length; i++) {
-                convertedArgs[i] = WystriConfiguration.get().getConverter(argTypes[i]).apply(args[i]);
+                convertedArgs[i] = WystriConfiguration.get().getConverter(argTypes[i]).stringToObject(args[i]);
             }
             try {
                 return (T) con.newInstance(convertedArgs);

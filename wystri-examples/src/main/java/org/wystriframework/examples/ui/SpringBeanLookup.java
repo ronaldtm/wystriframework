@@ -27,9 +27,10 @@ public class SpringBeanLookup implements IBeanLookup {
     }
 
     @Override
-    public void inject(Object bean) {
+    public <T> T inject(T bean) {
         final ServletContext sc = application.getServletContext();
         final WebApplicationContext ac = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
         ac.getAutowireCapableBeanFactory().autowireBean(bean);
+        return bean;
     }
 }

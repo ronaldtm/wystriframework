@@ -10,7 +10,7 @@ public class NewInstanceBeanLookup implements IBeanLookup {
     }
 
     @Override
-    public void inject(Object bean) {
+    public <T> T inject(T bean) {
         ReflectionUtils.allDeclaredFields(bean.getClass())
             .filter(field -> field.isAnnotationPresent(Inject.class))
             .forEach(field -> {
@@ -20,5 +20,6 @@ public class NewInstanceBeanLookup implements IBeanLookup {
                     throw new RuntimeException(ex.getMessage(), ex);
                 }
             });
+        return bean;
     }
 }

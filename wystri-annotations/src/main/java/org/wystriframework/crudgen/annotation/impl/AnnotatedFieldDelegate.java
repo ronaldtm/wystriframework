@@ -3,8 +3,8 @@ package org.wystriframework.crudgen.annotation.impl;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
-import org.danekja.java.util.function.serializable.SerializableFunction;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
+import org.wystriframework.core.definition.IConverter;
 import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
@@ -50,8 +50,8 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
     }
 
     private static <F> F converter(IFieldView<F> view, String value) {
-        SerializableFunction<String, ? extends F> converter = WystriConfiguration.get().getConverter(view.getType());
-        return (converter != null) ? converter.apply(value) : null;
+        IConverter<? extends F> converter = WystriConfiguration.get().getConverter(view.getType());
+        return (converter != null) ? converter.stringToObject(value) : null;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
