@@ -12,11 +12,11 @@ import org.wystriframework.core.util.ReflectionUtils;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.crudgen.annotation.Field;
 
-public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
+public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onAfterProcessed(IFieldView<F> view, IRecord record) {
+    public void onAfterProcessed(IFieldView<E, F> view, IRecord<E> record) {
 
         final AnnotatedRecord<E> arecord = (AnnotatedRecord<E>) record;
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
@@ -28,13 +28,13 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
     }
 
     @SuppressWarnings("unchecked")
-    protected void processRequired(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected void processRequired(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
         view.setRequired(afield.isRequired(arecord));
     }
 
     @SuppressWarnings("unchecked")
-    protected static <E, F> void processVisible(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected static <E, F> void processVisible(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         boolean visible = processPredicate(arecord, field.visibleIf(), true);
         if (!visible && !Field.KEEP_VALUE.equals(field.invisibleDefaultValue()))
             view.setValue(converter(view, field.invisibleDefaultValue()));
@@ -42,14 +42,14 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<F> {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <E, F> void processEnabled(IFieldView<F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected static <E, F> void processEnabled(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         boolean enabled = processPredicate(arecord, field.enabledIf(), true);
         if (!enabled && !Field.KEEP_VALUE.equals(field.disabledDefaultValue()))
             view.setValue(converter(view, field.disabledDefaultValue()));
         view.setEnabled(enabled);
     }
 
-    private static <F> F converter(IFieldView<F> view, String value) {
+    private static <E, F> F converter(IFieldView<E, F> view, String value) {
         IConverter<? extends F> converter = WystriConfiguration.get().getConverter(view.getType());
         return (converter != null) ? converter.stringToObject(value) : null;
     }

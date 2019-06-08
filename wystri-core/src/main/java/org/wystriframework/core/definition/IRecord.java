@@ -2,11 +2,11 @@ package org.wystriframework.core.definition;
 
 import java.io.Serializable;
 
-public interface IRecord extends Serializable {
+public interface IRecord<E> extends Serializable {
 
-    Object getTargetObject();
-    IEntity getEntity();
-    <F> F getValue(IField<F> field);
-    <F> void setValue(IField<F> field, F value);
+    E getTargetObject();
+    IEntity<E> getEntity();
+    <F> F getValue(IField<E, F> field);
+    <F> void setValue(IField<E, F> field, F value);
 
 }

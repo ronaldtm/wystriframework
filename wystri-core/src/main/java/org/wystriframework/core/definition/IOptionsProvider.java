@@ -3,14 +3,14 @@ package org.wystriframework.core.definition;
 import java.io.Serializable;
 import java.util.List;
 
-public interface IOptionsProvider<T> extends Serializable {
+public interface IOptionsProvider<E, F> extends Serializable {
 
-    List<? extends T> getOptions(IRecord record);
+    List<? extends F> getOptions(IRecord<E> record);
 
-    String objectToId(T object);
+    String objectToId(F object);
 
-    T idToObject(String id, List<? extends T> options);
+    F idToObject(String id, List<? extends F> options);
 
-    String objectToDisplay(T object, List<? extends T> options);
+    String objectToDisplay(F object, List<? extends F> options);
 
 }

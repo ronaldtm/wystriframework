@@ -3,7 +3,7 @@ package org.wystriframework.crudgen.annotation.impl;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-public class AnnotatedRecord<E> implements IRecord {
+public class AnnotatedRecord<E> implements IRecord<E> {
 
     private final AnnotatedEntity<E> entity;
     private final E                  object;
@@ -30,14 +30,14 @@ public class AnnotatedRecord<E> implements IRecord {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F> F getValue(IField<F> field) {
+    public <F> F getValue(IField<E, F> field) {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) field;
         return afield.getValue(object);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <F> void setValue(IField<F> field, F value) {
+    public <F> void setValue(IField<E, F> field, F value) {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) field;
         afield.setValue(object, value);
     }

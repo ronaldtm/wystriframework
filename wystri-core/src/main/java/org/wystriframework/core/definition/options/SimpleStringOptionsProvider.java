@@ -7,12 +7,12 @@ import org.wystriframework.core.definition.IRecord;
 
 import com.google.common.collect.ImmutableList;
 
-public class SimpleStringOptionsProvider implements IOptionsProvider<String> {
+public class SimpleStringOptionsProvider<E> implements IOptionsProvider<E, String> {
 
     private ImmutableList<String> options;
 
     @Override
-    public List<? extends String> getOptions(IRecord record) {
+    public List<? extends String> getOptions(IRecord<E> record) {
         return options;
     }
 
@@ -34,11 +34,11 @@ public class SimpleStringOptionsProvider implements IOptionsProvider<String> {
     public List<? extends String> getOptions() {
         return options;
     }
-    public SimpleStringOptionsProvider setOptions(List<String> options) {
+    public SimpleStringOptionsProvider<E> setOptions(List<String> options) {
         this.options = ImmutableList.copyOf(options);
         return this;
     }
-    public SimpleStringOptionsProvider setOptions(String... options) {
+    public SimpleStringOptionsProvider<E> setOptions(String... options) {
         return setOptions(ImmutableList.copyOf(options));
     }
 }

@@ -10,8 +10,8 @@ import org.wystriframework.core.wicket.bootstrap.BSCustomFileField;
 public class FileUploadFieldAppender extends AbstractFieldComponentAppender<IFileRef> {
 
     @Override
-    protected FormComponent<IFileRef> newFormComponent(FieldComponentContext<IFileRef> ctx) {
-        final IField<IFileRef> field = (IField<IFileRef>) ctx.getField();
+    protected <E> FormComponent<IFileRef> newFormComponent(FieldComponentContext<E, IFileRef> ctx) {
+        final IField<E, IFileRef> field = (IField<E, IFileRef>) ctx.getField();
 
         return new BSCustomFileField(field.getName(), ctx.getRecord().field(field));
     }

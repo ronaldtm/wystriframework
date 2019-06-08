@@ -7,13 +7,13 @@ import org.wystriframework.core.definition.IFieldLayout;
 import org.wystriframework.core.util.ReflectionUtils;
 import org.wystriframework.crudgen.annotation.Field;
 
-public class AnnotatedEntity<T> implements IEntity {
+public class AnnotatedEntity<E> implements IEntity<E> {
 
     private String   name;
 
-    private Class<T> objectClass;
+    private Class<E> objectClass;
 
-    public AnnotatedEntity(Class<T> type) {
+    public AnnotatedEntity(Class<E> type) {
         this.name = type.getSimpleName();
         this.objectClass = type;
     }
@@ -24,19 +24,19 @@ public class AnnotatedEntity<T> implements IEntity {
     }
 
     @Override
-    public Stream<AnnotatedField<T, ?>> fields() {
+    public Stream<AnnotatedField<E, ?>> fields() {
         return ReflectionUtils.allDeclaredFields(getObjectClass())
             .filter(field -> ReflectionUtils.isAnnotationPresent(field, Field.class))
             .map(field -> new AnnotatedField<>(this, field));
     }
 
     @Override
-    public IFieldLayout getLayout() {
-        return new AnnotatedFieldLayout<>(this);
+    public IFieldLayout<E> getLayout() {
+        return new AnnotatedFieldLayout<E>(this);
     }
 
     @SuppressWarnings("unchecked")
-    public Class<T> getObjectClass() {
+    public Class<E> getObjectClass() {
         return objectClass;
     }
 }

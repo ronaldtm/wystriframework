@@ -2,9 +2,9 @@ package org.wystriframework.core.definition;
 
 import java.io.Serializable;
 
-public interface IFieldView<T> extends Serializable {
+public interface IFieldView<E, T> extends Serializable {
 
-    IField<T> getField();
+    IField<E, T> getField();
     
     T getValue();
     void setValue(T value);

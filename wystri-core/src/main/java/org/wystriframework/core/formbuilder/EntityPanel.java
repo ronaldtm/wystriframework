@@ -1,24 +1,20 @@
-package org.wystriframework.crudgen.view.wicket;
+package org.wystriframework.core.formbuilder;
 
-import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.formbuilder.EntityFormBuilder;
-import org.wystriframework.core.wicket.component.photoswipe.PhotoSwipe;
 
-public class CrudgenPanel<R extends IRecord<E>, E> extends Panel {
+public class EntityPanel<R extends IRecord<E>, E> extends FormComponentPanel<R> {
 
     private EntityFormBuilder entityFormBuilder = new EntityFormBuilder();
 
-    public CrudgenPanel(String id, IModel<R> model) {
+    public EntityPanel(String id, IModel<R> model) {
         super(id, model);
-
-        add(new PhotoSwipe("photoSwipe"));
     }
 
     @Override
-    protected void onInitialize() {
-        super.onInitialize();
+    protected void onConfigure() {
+        super.onConfigure();
         rebuild();
     }
 
@@ -26,11 +22,13 @@ public class CrudgenPanel<R extends IRecord<E>, E> extends Panel {
         addOrReplace(entityFormBuilder.build("entity", getModel()));
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public IModel<R> getModel() {
         return (IModel<R>) getDefaultModel();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public R getModelObject() {
         return (R) getDefaultModelObject();

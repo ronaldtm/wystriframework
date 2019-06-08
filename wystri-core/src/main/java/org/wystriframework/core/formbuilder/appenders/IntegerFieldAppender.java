@@ -12,8 +12,8 @@ import org.wystriframework.core.wicket.WystriConfiguration;
 public class IntegerFieldAppender extends AbstractFieldComponentAppender<Integer> {
 
     @Override
-    protected FormComponent<Integer> newFormComponent(FieldComponentContext<Integer> ctx) {
-        final IField<Integer> field = ctx.getField();
+    protected <E> FormComponent<Integer> newFormComponent(FieldComponentContext<E, Integer> ctx) {
+        final IField<E, Integer> field = ctx.getField();
         return new TextField<Integer>(field.getName(), ctx.getRecord().field(field), Integer.class) {
             @Override
             protected void reportRequiredError() {

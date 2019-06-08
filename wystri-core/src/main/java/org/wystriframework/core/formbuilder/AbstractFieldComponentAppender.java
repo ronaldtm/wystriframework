@@ -26,10 +26,10 @@ import org.wystriframework.core.wicket.bootstrap.BSValidationStatusBehavior;
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
     @SuppressWarnings("unchecked")
-    protected abstract FormComponent<T> newFormComponent(FieldComponentContext<T> ctx);
+    protected abstract <E> FormComponent<T> newFormComponent(FieldComponentContext<E, T> ctx);
 
     @Override
-    public IFieldView<T> append(FieldComponentContext<T> ctx) {
+    public <E> IFieldView<E, T> append(FieldComponentContext<E, T> ctx) {
         final BSFormGroup formGroup = ctx.getLayout().newFormGroup();
         ctx.setFormGroup(formGroup);
 
@@ -39,19 +39,19 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         return configure(ctx.setFieldComponent(fc));
     }
 
-    protected IFieldView<T> configure(FieldComponentContext<T> ctx) {
+    protected <E> IFieldView<E, T> configure(FieldComponentContext<E, T> ctx) {
         final BSFormGroup formGroup = ctx.getFormGroup();
         final FormComponent<T> fieldComponent = ctx.getFieldComponent();
-        final IField<T> field = ctx.getField();
+        final IField<E, T> field = ctx.getField();
 
-        final IFieldView<T> fieldView = newFieldView(ctx);
+        final IFieldView<E, T> fieldView = newFieldView(ctx);
         EntityFormProcessor.associateView(fieldComponent, fieldView);
 
         fieldComponent
             .setLabel(new LabelModel<>(field))
             .add(new ConstraintValidator<>(ctx, field))
             .add(BSValidationStatusBehavior.getInstance())
-            .add(new OnAfterProcessedBehavior(field, fieldView, ctx.getRecord()));
+            .add(new OnAfterProcessedBehavior<>(field, fieldView, ctx.getRecord()));
 
         final SerializableConsumer<AjaxRequestTarget> refreshGroup = t -> {
             t.add(formGroup);
@@ -62,7 +62,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         return fieldView;
     }
 
-    protected IFieldView<T> newFieldView(FieldComponentContext<T> ctx) {
+    protected <E> IFieldView<E, T> newFieldView(FieldComponentContext<E, T> ctx) {
         return new FormComponentFieldView<>(ctx);
     }
 
@@ -80,11 +80,11 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         });
     }
 
-    private class OnAfterProcessedBehavior extends Behavior {
-        private final IField<T>                      field;
-        private final IFieldView<T>                  fieldView;
-        private final RecordModel<? extends IRecord> record;
-        protected OnAfterProcessedBehavior(IField<T> field, IFieldView<T> fieldView, RecordModel<? extends IRecord> record) {
+    private class OnAfterProcessedBehavior<E> extends Behavior {
+        private final IField<E, T>                      field;
+        private final IFieldView<E, T>                  fieldView;
+        private final RecordModel<? extends IRecord<E>, E> record;
+        protected OnAfterProcessedBehavior(IField<E, T> field, IFieldView<E, T> fieldView, RecordModel<? extends IRecord<E>, E> record) {
             this.field = field;
             this.fieldView = fieldView;
             this.record = record;
@@ -97,27 +97,27 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         }
     }
 
-    private static class ConstraintValidator<T> implements IValidator<T> {
-        private final FieldComponentContext<T> ctx;
-        private final IField<T>                field;
-        protected ConstraintValidator(FieldComponentContext<T> ctx, IField<T> field) {
+    private static class ConstraintValidator<E, F> implements IValidator<F> {
+        private final FieldComponentContext<E, F> ctx;
+        private final IField<E, F>                field;
+        protected ConstraintValidator(FieldComponentContext<E, F> ctx, IField<E, F> field) {
             this.ctx = ctx;
             this.field = field;
         }
         @Override
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        public void validate(IValidatable<T> validatable) {
-            final ValidatableConstrainable<T> constrainable = new ValidatableConstrainable<T>(field, validatable);
+        public void validate(IValidatable<F> validatable) {
+            final ValidatableConstrainable<F> constrainable = new ValidatableConstrainable<F>(field, validatable);
 
-            for (IConstraint<?> constraint : field.getConstraints(ctx.getRecord().getObject()))
+            for (IConstraint<? super F> constraint : field.getConstraints(ctx.getRecord().getObject()))
                 constraint.check((IConstrainable) constrainable);
         }
     }
 
     protected static class ValidatableConstrainable<T> implements IConstrainable<T> {
-        private final IField<T>       field;
+        private final IField<?, T>    field;
         private final IValidatable<T> validatable;
-        protected ValidatableConstrainable(IField<T> field, IValidatable<T> validatable) {
+        protected ValidatableConstrainable(IField<?, T> field, IValidatable<T> validatable) {
             this.field = field;
             this.validatable = validatable;
         }
@@ -150,8 +150,8 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
     }
 
     private static final class LabelModel<T> implements IModel<String> {
-        private final IField<T> field;
-        private LabelModel(IField<T> field) {
+        private final IField<?, T> field;
+        private LabelModel(IField<?, T> field) {
             this.field = field;
         }
         @Override

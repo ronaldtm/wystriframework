@@ -23,12 +23,12 @@ public class DropDownFieldAppender<T> extends AbstractFieldComponentAppender<T> 
 
     @Override
     @SuppressWarnings("unchecked")
-    protected FormComponent<T> newFormComponent(FieldComponentContext<T> ctx) {
+    protected <E> FormComponent<T> newFormComponent(FieldComponentContext<E, T> ctx) {
 
-        final IField<T> field = (IField<T>) ctx.getField();
-        final RecordModel<? extends IRecord> recordModel = ctx.getRecord();
+        final IField<E, T> field = (IField<E, T>) ctx.getField();
+        final RecordModel<? extends IRecord<E>, E> recordModel = ctx.getRecord();
 
-        IOptionsProvider<T> optionsProvider = field.getOptionsProvider().orElse(null);
+        IOptionsProvider<E, T> optionsProvider = field.getOptionsProvider().orElse(null);
 
         final IChoiceRenderer<T> choiceRenderer = new IChoiceRenderer<T>() {
             @Override
@@ -63,7 +63,7 @@ public class DropDownFieldAppender<T> extends AbstractFieldComponentAppender<T> 
     }
 
     @Override
-    protected IFieldView<T> newFieldView(FieldComponentContext<T> ctx) {
+    protected <E> IFieldView<E, T> newFieldView(FieldComponentContext<E, T> ctx) {
         return new FormComponentFieldView<>(ctx) {
             @Override
             public void setRequired(boolean required) {

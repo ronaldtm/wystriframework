@@ -43,9 +43,9 @@ public class EntityFormBuilder implements Serializable {
     private static final SerializableSupplier<IFieldComponentAppender<?>> DEFAULT_APPENDER = StringFieldAppender::new;
 
     @SuppressWarnings("unchecked")
-    public Component build(String id, IModel<? extends IRecord> recordModel) {
-        final RecordModel<? extends IRecord> record = new RecordModel<>(recordModel);
-        final IEntity entity = record.getObject().getEntity();
+    public <E, F> Component build(String id, IModel<? extends IRecord<E>> recordModel) {
+        final RecordModel<? extends IRecord<E>, E> record = new RecordModel<>(recordModel);
+        final IEntity<?> entity = record.getObject().getEntity();
 
         final BSFormSectionListView sectionsView = new BSFormSectionListView(id);
         for (Section section : entity.getLayout().getSections()) {
@@ -56,11 +56,11 @@ public class EntityFormBuilder implements Serializable {
                 final IBSFormGroupLayout formRow = layout.newFormRow();
                 Map<String, StringValue> params = new HashMap<>();
                 for (Cell cell : cells) {
-                    final IField<?> field = cell.getField();
+                    final IField<E, ?> field = (IField<E, ?>) cell.getField();
                     final String spec = cell.getSpec();
 
                     final SerializableConsumer<BSFormGroup> groupConfigurer = g -> g.add($b.attrAppend("class", " " + spec));
-                    final FieldComponentContext<?> ctx = new FieldComponentContext<>(formRow, record, field, params, groupConfigurer);
+                    final FieldComponentContext<E, ?> ctx = new FieldComponentContext<>(formRow, record, field, params, groupConfigurer);
 
                     appendField(ctx);
                 }
@@ -70,19 +70,19 @@ public class EntityFormBuilder implements Serializable {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <F> IFieldView<F> appendField(FieldComponentContext<F> ctx) {
+    private <E, F> IFieldView<E, F> appendField(FieldComponentContext<E, F> ctx) {
         return getAppender(ctx.getField(), DEFAULT_APPENDER)
             .append(ctx);
     }
 
     @SuppressWarnings("unchecked")
-    protected <F> IFieldComponentAppender<F> getAppender(IField<F> field, SerializableSupplier<IFieldComponentAppender<?>> defaultAppender) {
+    protected <E, F> IFieldComponentAppender<F> getAppender(IField<E, F> field, SerializableSupplier<IFieldComponentAppender<?>> defaultAppender) {
         final IFieldComponentAppender<F> appender = field.getMetadata().get(IFieldComponentAppender.class);
         if (appender != null)
             return appender;
 
-        return (IFieldComponentAppender<F>) findAppender(field)
-            .orElseGet(defaultAppender);
+        return findAppender(field)
+            .orElseGet(() -> (IFieldComponentAppender<F>) defaultAppender.get());
     }
 
     @SuppressWarnings("rawtypes")
@@ -96,9 +96,9 @@ public class EntityFormBuilder implements Serializable {
         .build());
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected <F> Optional<IFieldComponentAppender<?>> findAppender(IField<F> field) {
+    protected <E, F> Optional<IFieldComponentAppender<F>> findAppender(IField<E, F> field) {
 
-        Optional<? extends IOptionsProvider<F>> op = field.getOptionsProvider();
+        Optional<? extends IOptionsProvider<E, F>> op = field.getOptionsProvider();
 
         if (op.isPresent()) {
             return Optional.of(new DropDownFieldAppender<>());

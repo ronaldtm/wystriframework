@@ -12,15 +12,15 @@ import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 public class CheckboxFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
     @Override
-    protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
-        final IField<Boolean> ifield = (IField<Boolean>) ctx.getField();
+    protected <E> FormComponent<Boolean> newFormComponent(FieldComponentContext<E, Boolean> ctx) {
+        final IField<E, Boolean> ifield = (IField<E, Boolean>) ctx.getField();
 
         ctx.getFormGroup().setMode(BSFormGroup.Mode.CHECK);
         return newBooleanCheckField(ctx.getRecord(), ifield);
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord> record, IField<Boolean> field) {
+    private <E> FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord<E>, E> record, IField<E, Boolean> field) {
         return new CheckBox(field.getName(), record.field(field));
     }
 }

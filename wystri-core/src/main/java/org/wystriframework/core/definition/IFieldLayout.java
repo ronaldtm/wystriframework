@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.google.common.collect.ImmutableList;
 
-public interface IFieldLayout extends Serializable {
+public interface IFieldLayout<E> extends Serializable {
 
     List<Section> getSections();
 
     public static class Section implements Serializable {
-        private final String             title;
+        private final String                title;
         private final ImmutableList<Row> rows;
         public Section(String title, List<Row> rows) {
             this.title = title;
@@ -33,16 +33,16 @@ public interface IFieldLayout extends Serializable {
     }
 
     public static class Cell implements Serializable {
-        private final IField<?> field;
-        private final String    spec;
+        private final IField<?, ?> field;
+        private final String       spec;
 
-        public Cell(IField<?> field, String spec) {
+        public Cell(IField<?, ?> field, String spec) {
             this.field = field;
             this.spec = spec;
         }
         //@formatter:off
-        public IField<?> getField() { return field; }
-        public String    getSpec()  { return spec ; }
+        public IField<?,?> getField() { return field; }
+        public String      getSpec()  { return spec ; }
         //@formatter:on
     }
 }

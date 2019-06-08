@@ -8,11 +8,11 @@ import org.wystriframework.core.definition.IFieldLayout;
 
 import com.querydsl.sql.RelationalPath;
 
-public class QDSLEntity<T> implements IEntity {
+public class QDSLEntity<E> implements IEntity<E> {
 
-    private final RelationalPath<T> entityPath;
+    private final RelationalPath<E> entityPath;
 
-    public QDSLEntity(RelationalPath<T> entityPath) {
+    public QDSLEntity(RelationalPath<E> entityPath) {
         this.entityPath = entityPath;
     }
 
@@ -22,16 +22,16 @@ public class QDSLEntity<T> implements IEntity {
     }
 
     @Override
-    public Stream<? extends IField<?>> fields() {
+    public Stream<? extends IField<E, ?>> fields() {
         return Stream.empty();
     }
     
     @Override
-    public IFieldLayout getLayout() {
+    public IFieldLayout<E> getLayout() {
         return null;
     }
 
-    public RelationalPath<T> getEntityPath() {
+    public RelationalPath<E> getEntityPath() {
         return entityPath;
     }
 

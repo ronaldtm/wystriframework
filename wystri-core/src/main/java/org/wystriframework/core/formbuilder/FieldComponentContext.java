@@ -12,19 +12,19 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.bootstrap.BSFormGroup;
 import org.wystriframework.core.wicket.bootstrap.IBSFormGroupLayout;
 
-public class FieldComponentContext<T> implements Serializable {
+public class FieldComponentContext<E, F> implements Serializable {
 
-    private static final StringValue             EMPTY_PARAM = StringValue.valueOf("");
+    private static final StringValue                   EMPTY_PARAM = StringValue.valueOf("");
 
-    private final IBSFormGroupLayout             layout;
-    private final RecordModel<? extends IRecord> record;
-    private final IField<T>                      field;
-    private final Map<String, StringValue>       params;
-    private final Consumer<BSFormGroup>          groupConfigurer;
-    private BSFormGroup                          formGroup;
-    private FormComponent<T>                     fieldComponent;
+    private final IBSFormGroupLayout                   layout;
+    private final RecordModel<? extends IRecord<E>, E> record;
+    private final IField<E, F>                         field;
+    private final Map<String, StringValue>             params;
+    private final Consumer<BSFormGroup>                groupConfigurer;
+    private BSFormGroup                                formGroup;
+    private FormComponent<F>                           fieldComponent;
 
-    public FieldComponentContext(IBSFormGroupLayout layout, RecordModel<? extends IRecord> record, IField<T> field, Map<String, StringValue> params, SerializableConsumer<BSFormGroup> groupConfigurer) {
+    public FieldComponentContext(IBSFormGroupLayout layout, RecordModel<? extends IRecord<E>, E> record, IField<E, F> field, Map<String, StringValue> params, SerializableConsumer<BSFormGroup> groupConfigurer) {
         this.layout = layout;
         this.record = record;
         this.field = field;
@@ -39,10 +39,10 @@ public class FieldComponentContext<T> implements Serializable {
     public IBSFormGroupLayout getLayout() {
         return layout;
     }
-    public RecordModel<? extends IRecord> getRecord() {
+    public RecordModel<? extends IRecord<E>, E> getRecord() {
         return record;
     }
-    public IField<T> getField() {
+    public IField<E, F> getField() {
         return field;
     }
     public Consumer<BSFormGroup> getGroupConfigurer() {
@@ -51,16 +51,16 @@ public class FieldComponentContext<T> implements Serializable {
     public BSFormGroup getFormGroup() {
         return formGroup;
     }
-    public FieldComponentContext<T> setFormGroup(BSFormGroup formGroup) {
+    public FieldComponentContext<E, F> setFormGroup(BSFormGroup formGroup) {
         this.formGroup = formGroup;
         if (getGroupConfigurer() != null)
             getGroupConfigurer().accept(formGroup);
         return this;
     }
-    public FormComponent<T> getFieldComponent() {
+    public FormComponent<F> getFieldComponent() {
         return fieldComponent;
     }
-    public FieldComponentContext<T> setFieldComponent(FormComponent<T> fieldComponent) {
+    public FieldComponentContext<E, F> setFieldComponent(FormComponent<F> fieldComponent) {
         this.fieldComponent = fieldComponent;
         return this;
     }

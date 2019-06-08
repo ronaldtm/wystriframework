@@ -5,12 +5,12 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-public class FieldModel<T> implements IModel<T>, IWrapModel<T> {
+public class FieldModel<E, T> implements IModel<T>, IWrapModel<T> {
 
-    private final IModel<IRecord> recordModel;
-    private final IField<T>       field;
+    private final IModel<IRecord<E>> recordModel;
+    private final IField<E, T>       field;
 
-    public FieldModel(IModel<IRecord> record, IField<T> field) {
+    public FieldModel(IModel<IRecord<E>> record, IField<E, T> field) {
         this.recordModel = record;
         this.field = field;
     }
@@ -35,15 +35,15 @@ public class FieldModel<T> implements IModel<T>, IWrapModel<T> {
         return getRecordModel();
     }
 
-    public IField<T> getField() {
+    public IField<E, T> getField() {
         return field;
     }
 
-    public IModel<IRecord> getRecordModel() {
+    public IModel<IRecord<E>> getRecordModel() {
         return recordModel;
     }
 
-    public IRecord getRecord() {
+    public IRecord<E> getRecord() {
         return getRecordModel().getObject();
     }
 }

@@ -16,7 +16,7 @@ import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldLayout;
 import org.wystriframework.crudgen.annotation.FormLayout;
 
-public class AnnotatedFieldLayout<E> implements IFieldLayout {
+public class AnnotatedFieldLayout<E> implements IFieldLayout<E> {
 
     private final AnnotatedEntity<E> entity;
 
@@ -79,7 +79,7 @@ public class AnnotatedFieldLayout<E> implements IFieldLayout {
     }
 
     private List<Section> resolveSectionsFromFormLayoutAnnotation(FormLayout formLayout) {
-        Map<String, IField<?>> fields = entity.fields()
+        Map<String, IField<?, ?>> fields = entity.fields()
             .collect(Collectors.toMap(IField::getName, Function.identity()));
 
         final List<Section> sections = new ArrayList<>();
@@ -91,7 +91,7 @@ public class AnnotatedFieldLayout<E> implements IFieldLayout {
         return sections;
     }
 
-    private Section createSection(String title, FormLayout.Row[] fRows, Map<String, IField<?>> fields) {
+    private Section createSection(String title, FormLayout.Row[] fRows, Map<String, IField<?, ?>> fields) {
         final List<Row> rows = new ArrayList<>();
         for (FormLayout.Row row : fRows) {
             final List<Cell> cells = new ArrayList<>();

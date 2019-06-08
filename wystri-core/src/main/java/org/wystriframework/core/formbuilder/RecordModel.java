@@ -7,7 +7,7 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-public class RecordModel<R extends IRecord> implements IModel<R>, IComponentInheritedModel<R> {
+public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, IComponentInheritedModel<R> {
 
     private Object object;
 
@@ -34,7 +34,7 @@ public class RecordModel<R extends IRecord> implements IModel<R>, IComponentInhe
         return null;
     }
 
-    public <F> IModel<F> field(IField<F> field) {
+    public <F> IModel<F> field(IField<E, F> field) {
         return new IModel<F>() {
             @Override
             public F getObject() {

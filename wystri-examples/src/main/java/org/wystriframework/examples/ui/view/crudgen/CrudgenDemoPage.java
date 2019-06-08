@@ -145,9 +145,9 @@ public class CrudgenDemoPage extends WebPage {
             }
         }
 
-        public static class GenderOptionsProvider implements IOptionsProvider<String> {
+        public static class GenderOptionsProvider<E> implements IOptionsProvider<E, String> {
             @Override
-            public List<String> getOptions(IRecord record) {
+            public List<String> getOptions(IRecord<E> record) {
                 return asList(
                     "Male to Female (MtF)",
                     "Female to Male (FtM)",

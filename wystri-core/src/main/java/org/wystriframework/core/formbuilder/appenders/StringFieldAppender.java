@@ -19,17 +19,17 @@ import org.wystriframework.core.wicket.util.IBehaviorShortcutsMixin;
 public class StringFieldAppender extends AbstractFieldComponentAppender<String> {
 
     @Override
-    protected FormComponent<String> newFormComponent(FieldComponentContext<String> ctx) {
-        final IField<String> stringField = (IField<String>) ctx.getField();
+    protected <E> FormComponent<String> newFormComponent(FieldComponentContext<E, String> ctx) {
+        final IField<E, String> stringField = (IField<E, String>) ctx.getField();
         final Optional<LengthConstraint> maxLength = stringField.getConstraint(ctx.getRecord().getObject(), LengthConstraint.class);
 
         return (maxLength.isPresent() && maxLength.get().getMax() > 255)
-            ? newLongStringField(ctx.getRecord(), (IField<String>) ctx.getField())
-            : newStringField(ctx.getRecord(), (IField<String>) ctx.getField());
+            ? newLongStringField(ctx.getRecord(), stringField)
+            : newStringField(ctx.getRecord(), stringField);
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<String> newStringField(final RecordModel<? extends IRecord> record, IField<String> field) {
+    private <E> FormComponent<String> newStringField(final RecordModel<? extends IRecord<E>, E> record, IField<E, String> field) {
         return new TextField<String>(field.getName(), record.field(field)) {
             @Override
             protected void reportRequiredError() {
@@ -44,7 +44,7 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
     }
 
     @SuppressWarnings("unchecked")
-    private FormComponent<String> newLongStringField(final RecordModel<? extends IRecord> record, IField<String> field) {
+    private <E> FormComponent<String> newLongStringField(final RecordModel<? extends IRecord<E>, E> record, IField<E, String> field) {
         final TextArea<String> comp = new TextArea<>(field.getName(), record.field(field));
         comp.add(IBehaviorShortcutsMixin.$b.attrAppend("rows", "5"));
         return comp;

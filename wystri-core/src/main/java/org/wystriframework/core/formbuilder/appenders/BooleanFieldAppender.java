@@ -44,10 +44,10 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
 
     @Override
     @SuppressWarnings("unchecked")
-    protected FormComponent<Boolean> newFormComponent(FieldComponentContext<Boolean> ctx) {
+    protected <E> FormComponent<Boolean> newFormComponent(FieldComponentContext<E, Boolean> ctx) {
 
-        final IField<Boolean> ifield = (IField<Boolean>) ctx.getField();
-        final RecordModel<? extends IRecord> record = ctx.getRecord();
+        final IField<E, Boolean> ifield = (IField<E, Boolean>) ctx.getField();
+        final RecordModel<? extends IRecord<E>, E> record = ctx.getRecord();
 
         final IChoiceRenderer<Boolean> choiceRenderer = new IChoiceRenderer<Boolean>() {
             @Override
@@ -88,7 +88,7 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
     }
 
     @Override
-    protected IFieldView<Boolean> newFieldView(FieldComponentContext<Boolean> ctx) {
+    protected <E> IFieldView<E, Boolean> newFieldView(FieldComponentContext<E, Boolean> ctx) {
         return new FormComponentFieldView<>(ctx) {
             @Override
             public void setRequired(boolean required) {

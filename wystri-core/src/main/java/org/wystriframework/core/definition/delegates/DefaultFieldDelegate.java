@@ -4,9 +4,9 @@ import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
 
-public class DefaultFieldDelegate implements IFieldDelegate<Object> {
+public class DefaultFieldDelegate implements IFieldDelegate<Object, Object> {
 
     @Override
-    public void onAfterProcessed(IFieldView<Object> view, IRecord record) {}
+    public void onAfterProcessed(IFieldView<Object, Object> view, IRecord<Object> record) {}
 
 }

@@ -4,20 +4,20 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 
-public interface IField<T> extends Serializable {
+public interface IField<E, T> extends Serializable {
 
-    IEntity getEntity();
+    IEntity<E> getEntity();
     String getName();
     Class<T> getType();
-    boolean isRequired(IRecord record);
-    boolean isEnabled(IRecord record);
-    boolean isVisible(IRecord record);
-    List<IConstraint<? super T>> getConstraints(IRecord record);
+    boolean isRequired(IRecord<E> record);
+    boolean isEnabled(IRecord<E> record);
+    boolean isVisible(IRecord<E> record);
+    List<IConstraint<? super T>> getConstraints(IRecord<E> record);
     FieldMetadata getMetadata();
-    IFieldDelegate<T> getDelegate();
-    String requiredError(IRecord record);
+    IFieldDelegate<E, T> getDelegate();
+    String requiredError(IRecord<E> record);
     
-    Optional<? extends IOptionsProvider<T>> getOptionsProvider();
+    Optional<? extends IOptionsProvider<E, T>> getOptionsProvider();
 
     default String getLabel() {
         return getName();
@@ -25,7 +25,7 @@ public interface IField<T> extends Serializable {
 
 
     @SuppressWarnings("unchecked")
-    default <C extends IConstraint<? super T>> Optional<C> getConstraint(IRecord record, Class<C> type) {
+    default <C extends IConstraint<? super T>> Optional<C> getConstraint(IRecord<E> record, Class<C> type) {
         final Optional<C> exact = getConstraints(record).stream()
             .filter(it -> type == it.getClass())
             .map(it -> (C) it)

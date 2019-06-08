@@ -4,14 +4,14 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public interface IRecordView extends Serializable {
+public interface IRecordView<E> extends Serializable {
 
-    IRecord getRecord();
-    <F> Stream<IFieldView<F>> fields();
+    IRecord<E> getRecord();
+    <F> Stream<IFieldView<E, F>> fields();
 
     @SuppressWarnings("unchecked")
-    default <F> IFieldView<F> field(String name) {
-        return (IFieldView<F>) fields()
+    default <F> IFieldView<E, F> field(String name) {
+        return (IFieldView<E, F>) fields()
             .filter(it -> Objects.equals(name, it.getName()))
             .findFirst()
             .get();

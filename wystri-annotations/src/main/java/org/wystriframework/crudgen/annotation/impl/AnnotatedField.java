@@ -38,12 +38,12 @@ import org.wystriframework.crudgen.annotation.Field;
 import org.wystriframework.crudgen.annotation.Selection;
 import org.wystriframework.crudgen.annotation.Selection.Option;
 
-public class AnnotatedField<E, F> implements IField<F> {
+public class AnnotatedField<E, F> implements IField<E, F> {
 
     private final AnnotatedEntity<E> entity;
     private final String             name;
 
-    private final IFieldDelegate<F>  delegate;
+    private final IFieldDelegate<E, F>  delegate;
 
     public static <E> AnnotatedField<E, ?> newSimpleField(AnnotatedEntity<E> entity, java.lang.reflect.Field field) {
         return new AnnotatedField<>(entity, field);
@@ -63,7 +63,7 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean isRequired(IRecord record) {
+    public boolean isRequired(IRecord<E> record) {
         final Field field = getFieldAnnotation(Field.class);
         if (field.required() != Bool.UNDEFINED) {
             return field.required().isTrue();
@@ -73,25 +73,25 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
-    public String requiredError(IRecord record) {
+    public String requiredError(IRecord<E> record) {
         final Field field = getFieldAnnotation(Field.class);
         return field.requiredError();
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean isEnabled(IRecord record) {
+    public boolean isEnabled(IRecord<E> record) {
         return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).enabledIf(), true);
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean isVisible(IRecord record) {
+    public boolean isVisible(IRecord<E> record) {
         return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).visibleIf(), true);
     }
 
     @Override
-    public List<IConstraint<? super F>> getConstraints(IRecord record) {
+    public List<IConstraint<? super F>> getConstraints(IRecord<E> record) {
         List<IConstraint<? super F>> constraints = new ArrayList<>();
         constraints.addAll(resolveMethodConstraints(record));
         constraints.addAll(resolveAnnotationConstraints());
@@ -160,12 +160,12 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Optional<? extends IOptionsProvider<F>> getOptionsProvider() {
+    public Optional<? extends IOptionsProvider<E, F>> getOptionsProvider() {
 
         Selection selection = getFieldAnnotation(Selection.class);
         if (selection != null) {
             if (!Modifier.isAbstract(selection.provider().getModifiers())) {
-                return (Optional<? extends IOptionsProvider<F>>) Optional.of(lookup().newInstance(selection.provider(), new String[0]));
+                return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(lookup().newInstance(selection.provider(), new String[0]));
 
             } else if (selection.options().length > 0) {
                 final Class<F> type = this.getType();
@@ -179,10 +179,10 @@ public class AnnotatedField<E, F> implements IField<F> {
 
                     opcoes.add(Triple.of(id, value, label));
                 }
-                return (Optional<? extends IOptionsProvider<F>>) Optional.of(new IOptionsProvider<F>() {
+                return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(new IOptionsProvider<E, F>() {
                     @Override
                     @SuppressWarnings("unchecked")
-                    public List<F> getOptions(IRecord record) {
+                    public List<F> getOptions(IRecord<E> record) {
                         return opcoes.stream()
                             .map(it -> it.getMiddle())
                             .collect(toList());
@@ -218,10 +218,10 @@ public class AnnotatedField<E, F> implements IField<F> {
                 final IConverter<F> converter = WystriConfiguration.get().getConverter(type);
 
                 List<String> opcoes = new ArrayList<>(asList(selection.value()));
-                return (Optional<? extends IOptionsProvider<F>>) Optional.of(new IOptionsProvider<F>() {
+                return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(new IOptionsProvider<E, F>() {
                     @Override
                     @SuppressWarnings("unchecked")
-                    public List<F> getOptions(IRecord record) {
+                    public List<F> getOptions(IRecord<E> record) {
                         return opcoes.stream()
                             .map(it -> converter.stringToObject(it))
                             .collect(toList());
@@ -246,7 +246,7 @@ public class AnnotatedField<E, F> implements IField<F> {
     }
 
     @Override
-    public IFieldDelegate<F> getDelegate() {
+    public IFieldDelegate<E, F> getDelegate() {
         return this.delegate;
     }
 
@@ -303,9 +303,9 @@ public class AnnotatedField<E, F> implements IField<F> {
 
     protected static final class MethodConstraint<F> implements IConstraint<F> {
         private final AnnotatedField<?, F>     field;
-        private final IRecord                  record;
+        private final IRecord<?>               record;
         private final Pair<String, Class<?>[]> methodSpec;
-        protected MethodConstraint(AnnotatedField<?, F> field, IRecord record, Pair<String, Class<?>[]> methodSpec) {
+        protected MethodConstraint(AnnotatedField<?, F> field, IRecord<?> record, Pair<String, Class<?>[]> methodSpec) {
             this.field = field;
             this.record = record;
             this.methodSpec = methodSpec;

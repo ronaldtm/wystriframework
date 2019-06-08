@@ -19,14 +19,14 @@ import com.querydsl.core.types.Path;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.RelationalPath;
 
-public class QDSLField<E, F> implements IField<F> {
+public class QDSLField<E, F> implements IField<E, F> {
 
     private final QDSLEntity<E>                entity;
     private final Path<F>                      path;
     private String                             name;
     private final FieldMetadata                metadata    = new FieldMetadata();
     private final List<IConstraint<? super F>> constraints = new ArrayList<>();
-    private IFieldDelegate<F>                  delegate;
+    private IFieldDelegate<E, F>               delegate;
 
     public static <E extends RelationalPath<E>, F> QDSLField<E, F> newSimpleField(QDSLEntity<E> entity, Path<F> columnPath) {
         return new QDSLField<>(entity, columnPath).withDefaultConstraints();
@@ -38,27 +38,27 @@ public class QDSLField<E, F> implements IField<F> {
     }
 
     @Override
-    public boolean isRequired(IRecord record) {
+    public boolean isRequired(IRecord<E> record) {
         return !entity.getEntityPath().getMetadata(path).isNullable();
     }
 
     @Override
-    public String requiredError(IRecord record) {
+    public String requiredError(IRecord<E> record) {
         return null;
     }
 
     @Override
-    public boolean isEnabled(IRecord record) {
+    public boolean isEnabled(IRecord<E> record) {
         return true;
     }
 
     @Override
-    public boolean isVisible(IRecord record) {
+    public boolean isVisible(IRecord<E> record) {
         return true;
     }
 
     @Override
-    public List<IConstraint<? super F>> getConstraints(IRecord record) {
+    public List<IConstraint<? super F>> getConstraints(IRecord<E> record) {
         return constraints;
     }
 
@@ -68,11 +68,11 @@ public class QDSLField<E, F> implements IField<F> {
     }
 
     @Override
-    public IFieldDelegate<F> getDelegate() {
+    public IFieldDelegate<E, F> getDelegate() {
         return delegate;
     }
 
-    public QDSLField<E, F> setDelegate(IFieldDelegate<F> delegate) {
+    public QDSLField<E, F> setDelegate(IFieldDelegate<E, F> delegate) {
         this.delegate = delegate;
         return this;
     }
@@ -97,7 +97,7 @@ public class QDSLField<E, F> implements IField<F> {
     }
 
     @Override
-    public Optional<? extends IOptionsProvider<F>> getOptionsProvider() {
+    public Optional<? extends IOptionsProvider<E, F>> getOptionsProvider() {
         return Optional.empty();
     }
 

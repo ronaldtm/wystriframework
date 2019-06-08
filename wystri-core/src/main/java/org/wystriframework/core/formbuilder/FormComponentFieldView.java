@@ -9,13 +9,13 @@ import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.wicket.WystriConfiguration;
 
-public class FormComponentFieldView<T> implements IFieldView<T> {
-    private final FieldComponentContext<T> ctx;
-    public FormComponentFieldView(FieldComponentContext<T> ctx) {
+public class FormComponentFieldView<E, T> implements IFieldView<E, T> {
+    private final FieldComponentContext<E, T> ctx;
+    public FormComponentFieldView(FieldComponentContext<E, T> ctx) {
         this.ctx = ctx;
     }
     @Override
-    public IField<T> getField() {
+    public IField<E, T> getField() {
         return ctx.getField();
     }
     @Override

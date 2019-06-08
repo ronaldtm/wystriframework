@@ -6,5 +6,5 @@ import org.wystriframework.core.definition.IFieldView;
 
 public interface IFieldComponentAppender<T> extends Serializable {
 
-    IFieldView<T> append(FieldComponentContext<T> ctx);
+    <E> IFieldView<E, T> append(FieldComponentContext<E , T> ctx);
 }
