@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.wystriframework</groupId>
   <artifactId>wystri-parent</artifactId>
@@ -17,14 +16,17 @@
   </licenses>
 
   <modules>
-    <module>wystriframework-core</module>
+    <module>wystri-core</module>
+    <module>wystri-annotations</module>
+    <module>wystri-querydsl</module>
+    <module>wystri-examples</module>
   </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <servlet-api.version>3.1.0</servlet-api.version>
     <javax-inject.version>1</javax-inject.version>
-    <wicket.version>8.4.0</wicket.version>
+    <wicket.version>8.5.0</wicket.version>
     <spring.version>5.1.6.RELEASE</spring.version>
     <jetty9.version>9.4.15.v20190215</jetty9.version>
     <slf4j.version>1.7.25</slf4j.version>
@@ -173,7 +175,7 @@
         <inherited>true</inherited>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.8.1</version>
         <configuration>
           <source>11</source>
           <target>11</target>

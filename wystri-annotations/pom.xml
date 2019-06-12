@@ -98,13 +98,5 @@
         </excludes>
       </testResource>
     </testResources>
-
-    <plugins>
-      <plugin>
-        <inherited>true</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      </plugin>
-    </plugins>
   </build>
 </project>
