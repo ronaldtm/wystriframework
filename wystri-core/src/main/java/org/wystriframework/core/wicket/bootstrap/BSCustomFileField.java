@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.filemanager.ITempFileManager;
@@ -106,11 +107,20 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
     }
 
     protected AbstractLink newDownloadLink(String id) {
-        return new ExternalLink(id, IModel.of(() -> {
-            return (getFileRef() != null)
-                ? urlFor(SessionScopedTempFileDownloadResource.getReference(getApplication()), new PageParameters().set("id", getFileRef().getId()))
-                : "";
-        }));
+        return new ExternalLink(id, new IModel<String>() {
+            @Override
+            public String getObject() {
+                return (getFileRef() != null)
+                    ? getDownloadUrl(getFileRef())
+                    : "javascript:alert('File not available')";
+            }
+        });
+    }
+
+    protected String getDownloadUrl(IFileRef fileRef) {
+        final ResourceReference resRef = SessionScopedTempFileDownloadResource.getReference(getApplication());
+        final PageParameters params = new PageParameters().set("id", fileRef.getId());
+        return urlFor(resRef, params).toString();
     }
 
     protected void onUploadComplete(AjaxRequestTarget target) {}
