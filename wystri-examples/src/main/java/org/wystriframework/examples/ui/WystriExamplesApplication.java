@@ -13,7 +13,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.springframework.stereotype.Component;
 import org.wystriframework.core.wicket.WystriConfiguration;
-import org.wystriframework.core.wicket.component.fileupload.CustomDiskFileItemFactory;
+import org.wystriframework.ui.component.fileupload.CustomDiskFileItemFactory;
 import org.wystriframework.examples.ui.view.crudgen.CrudgenDemoPage;
 import org.wystriframework.examples.ui.view.home.HomePage;
 

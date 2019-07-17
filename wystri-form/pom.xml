@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.wystriframework</groupId>
     <artifactId>wystri-parent</artifactId>
     <version>0.5-SNAPSHOT</version>
   </parent>
-  <artifactId>wystri-querydsl</artifactId>
+  <artifactId>wystri-form</artifactId>
   <packaging>jar</packaging>
-  <name>Wystri QueryDSL</name>
+  <name>Wystri Form</name>
   <description></description>
   <licenses>
     <license>
@@ -18,25 +17,38 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
+
   <dependencies>
-      <!--  WICKET DEPENDENCIES -->
     <dependency>
       <groupId>org.wystriframework</groupId>
-      <artifactId>wystri-form</artifactId>
+      <artifactId>wystri-ui</artifactId>
     </dependency>
-
-    <!-- QUERY DSL -->
+    
+    <!--  WICKET DEPENDENCIES -->
     <dependency>
-      <groupId>com.querydsl</groupId>
-      <artifactId>querydsl-sql</artifactId>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.querydsl</groupId>
-      <artifactId>querydsl-sql-codegen</artifactId>
-      <scope>test</scope>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-extensions</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.wicketstuff</groupId>
+      <artifactId>wicketstuff-lazymodel</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
 
-    <!-- LOGGING DEPENDENCIES - SLF4J-SIMPLE -->
+      <!-- LOGGING DEPENDENCIES - SLF4J-SIMPLE -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -50,6 +62,11 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+    </dependency>
+    
 <!--
       <dependency>
         <groupId>org.apache.commons</groupId>
