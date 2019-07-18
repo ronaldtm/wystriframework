@@ -1,4 +1,4 @@
-package org.wystriframework.core.formbuilder;
+package org.wystriframework.form.formbuilder;
 
 import org.apache.wicket.model.IModel;
 
