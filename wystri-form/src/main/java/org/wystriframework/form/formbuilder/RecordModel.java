@@ -9,6 +9,31 @@ import org.wystriframework.core.definition.IRecord;
 
 public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, IComponentInheritedModel<R> {
 
+    public class FieldModel<F> implements IModel<F>, ISnapshotModel<F> {
+        private final IField<E, F> field;
+        private transient F        snapshot;
+        public FieldModel(IField<E, F> field) {
+            this.field = field;
+        }
+        @Override
+        public F getObject() {
+            return RecordModel.this.getObject().getValue(field);
+        }
+        @Override
+        public void setObject(F object) {
+            this.snapshot = getObject();
+            RecordModel.this.getObject().setValue(field, object);
+        }
+        @Override
+        public void detach() {
+            RecordModel.this.detach();
+        }
+        @Override
+        public F getLastSnapshot() {
+            return this.snapshot;
+        }
+    }
+
     private Object object;
 
     public RecordModel(R object) {
@@ -35,19 +60,6 @@ public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, ICompone
     }
 
     public <F> IModel<F> field(IField<E, F> field) {
-        return new IModel<F>() {
-            @Override
-            public F getObject() {
-                return RecordModel.this.getObject().getValue(field);
-            }
-            @Override
-            public void setObject(F object) {
-                RecordModel.this.getObject().setValue(field, object);
-            }
-            @Override
-            public void detach() {
-                RecordModel.this.detach();
-            }
-        };
+        return new FieldModel<>(field);
     }
 }

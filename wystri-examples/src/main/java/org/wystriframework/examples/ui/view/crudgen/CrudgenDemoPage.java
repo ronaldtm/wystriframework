@@ -93,14 +93,14 @@ public class CrudgenDemoPage extends WebPage {
         @Field(label = "Foto do perfil",
             enabledIf = IsNotAnnonymous.class, disabledDefaultValue = "")
         public IFileRef profilePhoto;
+        
+        @Field(label = "Situação")
+        @CustomView(appender = BooleanFieldAppender.class, appenderArgs = { "Yep", "Nope", "Wut?" })
+        private Boolean situacao;
 
         @Field(required = Bool.TRUE, requiredError = "Campo obrigatório")
         @Range(rangeExpression = "[1..99999]")
         public int      matricula;
-
-        @Field(label = "Situação")
-        @CustomView(appender = BooleanFieldAppender.class, appenderArgs = { "Yep", "Nope", "Wut?" })
-        public Boolean  situacao;
 
         @Field
         @Selection(options = {
@@ -126,6 +126,15 @@ public class CrudgenDemoPage extends WebPage {
         @Field
         @Selection(provider = GenderOptionsProvider.class)
         public String   gender;
+
+        public Boolean getSituacao() {
+            return situacao;
+        }
+        public Person setSituacao(Boolean situacao) {
+            this.situacao = situacao;
+            this.matricula++;
+            return this;
+        }
 
         @Action(type = ActionType.PRIMARY)
         public void executar() {

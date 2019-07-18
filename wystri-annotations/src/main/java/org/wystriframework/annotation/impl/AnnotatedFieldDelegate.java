@@ -2,6 +2,7 @@ package org.wystriframework.annotation.impl;
 
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.annotation.Field;
@@ -22,9 +23,16 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
         final Field field = afield.getFieldAnnotation(Field.class);
 
+        processValueChanged(view, arecord, field);
         processRequired(view, arecord, field);
         processVisible(view, arecord, field);
         processEnabled(view, arecord, field);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void processValueChanged(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
+        if (!Objects.equals(view.getPreviousValue(), view.getValue()))
+            view.markDirty();
     }
 
     @SuppressWarnings("unchecked")
@@ -34,7 +42,7 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <E, F> void processVisible(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected void processVisible(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         boolean visible = processPredicate(arecord, field.visibleIf(), true);
         if (!visible && !Field.KEEP_VALUE.equals(field.invisibleDefaultValue()))
             view.setValue(converter(view, field.invisibleDefaultValue()));
@@ -42,7 +50,7 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
     }
 
     @SuppressWarnings("unchecked")
-    protected static <E, F> void processEnabled(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
+    protected void processEnabled(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         boolean enabled = processPredicate(arecord, field.enabledIf(), true);
         if (!enabled && !Field.KEEP_VALUE.equals(field.disabledDefaultValue()))
             view.setValue(converter(view, field.disabledDefaultValue()));

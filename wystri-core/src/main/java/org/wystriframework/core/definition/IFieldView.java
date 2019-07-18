@@ -6,6 +6,7 @@ public interface IFieldView<E, T> extends Serializable {
 
     IField<E, T> getField();
     
+    T getPreviousValue();
     T getValue();
     void setValue(T value);
     
@@ -15,6 +16,7 @@ public interface IFieldView<E, T> extends Serializable {
     void error(String msg);
     void info(String msg);
     void markDirty();
+    void cleanUp();
 
     default String getName() {
         return getField().getName();

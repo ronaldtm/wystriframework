@@ -34,6 +34,12 @@ public class EntityFormProcessor {
 
         recordContainer.visitChildren((Component comp, IVisit<Void> visit) -> {
             IFieldView<E, F> view = EntityFormProcessor.getView(comp);
+            if (view != null)
+                view.cleanUp();
+        });
+
+        recordContainer.visitChildren((Component comp, IVisit<Void> visit) -> {
+            IFieldView<E, F> view = EntityFormProcessor.getView(comp);
             if (view != null) {
                 IField<E, F> field = view.getField();
                 IFieldDelegate<E, F> delegate = field.getDelegate();
