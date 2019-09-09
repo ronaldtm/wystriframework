@@ -2,6 +2,7 @@ package org.wystriframework.ui.bootstrap;
 
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
+import static org.apache.commons.lang3.StringUtils.*;
 import static org.wystriframework.ui.component.jquery.JQuery.*;
 
 import java.io.File;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.attributes.AjaxCallListener;
 import org.apache.wicket.ajax.attributes.AjaxRequestAttributes;
@@ -25,6 +27,7 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.head.IHeaderResponse;
 import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
@@ -38,7 +41,7 @@ import org.apache.wicket.util.lang.Bytes;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.filemanager.ITempFileManager;
 import org.wystriframework.core.filemanager.SessionScopedTempFileDownloadResource;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.ui.component.fileupload.CustomDiskFileItem;
 import org.wystriframework.ui.component.fileupload.CustomFileUpload;
 import org.wystriframework.ui.component.fileupload.CustomFileUploadField;
@@ -46,18 +49,16 @@ import org.wystriframework.ui.util.IBehaviorShortcutsMixin;
 
 public class BSCustomFileField extends FormComponentPanel<IFileRef> {
 
+    private static final String        KEY_CLEAR_ICON      = "BSCustomFileField.clear.icon";
+    private static final String        KEY_SELECT_FILE     = "BSCustomFileField.select.label";
+    private static final String        EVENT_DELAYEDSUBMIT = "delayedsubmit";
+
     private transient List<FileUpload> fileList;
     private IFileRef                   fileRef;
+    private final Set<String>          acceptedFileTypes   = new LinkedHashSet<>();
 
     private final Form<?>              form;
     private final FileUploadField      input;
-    private final WebMarkupContainer   inputGroup;
-    private final WebMarkupContainer   linkGroup;
-    private final UploadBehavior       uploadBehavior;
-    private final AbstractLink         downloadLink;
-    private final ClearLink            clearLink;
-    private final BSProgressBar        progressBar;
-    private final Set<String>          acceptedFileTypes = new LinkedHashSet<>();
 
     public BSCustomFileField(String id) {
         this(id, null);
@@ -67,31 +68,30 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
         super(id, model);
 
         form = new Form<>("form");
+        input = newFileUploadField("input", new FileListModel());
+
+        final MarkupContainer linkGroup = new WebMarkupContainer("linkGroup");
+        final MarkupContainer inputGroup = new WebMarkupContainer("inputGroup");
+        final AbstractLink downloadLink = newDownloadLink("link");
+        final UploadBehavior uploadBehavior = new UploadBehavior(form, EVENT_DELAYEDSUBMIT);
+        final IModel<String> fileDescription = () -> (getFileRef() == null) ? getString(KEY_SELECT_FILE, null, "...") : getFileDescription(getFileRef());
+
         form.setMultiPart(true);
-
-        input = new BSCustomFileUploadField("input", new FileListModel());
-        uploadBehavior = new UploadBehavior("delayedsubmit");
-        linkGroup = new WebMarkupContainer("linkGroup");
-        downloadLink = newDownloadLink("link");
-        clearLink = new ClearLink("clear");
-        progressBar = new BSProgressBar("progress", form, input);
-        inputGroup = new WebMarkupContainer("inputGroup");
-
-        final IModel<String> fileDescription = () -> (getFileRef() == null) ? "Selecione..." : getFileDescription(getFileRef());
 
         add(form
 
             .add(linkGroup
                 .add(downloadLink.setBody(fileDescription)
                     .add(IBehaviorShortcutsMixin.$b.attrReplace("target", "_" + getClass().getSimpleName() + "_" + downloadLink.getMarkupId())))
-                .add(clearLink))
+                .add(newClearLink("clearLink")
+                    .add(newClearIcon("clearIcon"))))
 
             .add(inputGroup
                 .add(input
                     .setLabel(fileDescription)
                     .add(uploadBehavior)))
 
-            .add(progressBar)
+            .add(new BSProgressBar("progress", form, input))
 
             .setOutputMarkupId(true).setOutputMarkupPlaceholderTag(true)
 
@@ -105,34 +105,12 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
             }));
     }
 
-    protected AbstractLink newDownloadLink(String id) {
-        return new ExternalLink(id, new IModel<String>() {
-            @Override
-            public String getObject() {
-                return (getFileRef() != null)
-                    ? getDownloadUrl(getFileRef())
-                    : "javascript:alert('File not available')";
-            }
-        });
-    }
-
-    protected String getDownloadUrl(IFileRef fileRef) {
-        final ResourceReference resRef = SessionScopedTempFileDownloadResource.getReference(getApplication());
-        final PageParameters params = new PageParameters().set("id", fileRef.getId());
-        return urlFor(resRef, params).toString();
-    }
-
     protected void onUploadComplete(AjaxRequestTarget target) {}
     protected void onUploadError(AjaxRequestTarget target, Optional<? extends Exception> error) {}
 
-    protected String getFileDescription(IFileRef fileRef) {
-        if (fileRef == null)
-            return null;
-        return String.format("%s [%s]", fileRef.getName(), Bytes.bytes(fileRef.getSize()));
-    }
-
     protected void onClear(AjaxRequestTarget target) {
         this.setFileRef(null);
+        target.add(form);
     }
 
     @Override
@@ -142,6 +120,35 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
             this.setFileRef(getModelObject());
     }
 
+    protected AbstractLink newDownloadLink(String id) {
+        return new ExternalLink(id, () -> getDownloadURL());
+    }
+    protected Component newClearIcon(String id) {
+        return new ClearIcon(id);
+    }
+    protected AbstractLink newClearLink(String id) {
+        return new AjaxLink<Void>(id) {
+            @Override
+            public void onClick(AjaxRequestTarget target) {
+                onClear(target);
+            }
+        };
+    }
+
+    protected Optional<File> resolveFile(final FileUpload fu) {
+        try {
+            if (fu instanceof CustomFileUpload) {
+                final CustomFileUpload cfu = (CustomFileUpload) fu;
+                final CustomDiskFileItem fileItem = cfu.getItem();
+                final File tempFile = fileItem.getTempFile();
+                if (tempFile.canWrite())
+                    return Optional.of(tempFile);
+            }
+            return Optional.empty();
+        } catch (SecurityException | IllegalArgumentException ex) {
+            return Optional.empty();
+        }
+    }
     public BSCustomFileField setAcceptedFileTypes(Collection<String> types) {
         this.acceptedFileTypes.clear();
         this.acceptedFileTypes.addAll(types);
@@ -156,6 +163,32 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
         return Collections.unmodifiableSet(acceptedFileTypes);
     }
 
+    protected String getDownloadURL() {
+        return (getFileRef() != null)
+            ? getDownloadUrl(getFileRef())
+            : "javascript:alert('File not available')";
+    }
+
+    protected FileUploadField newFileUploadField(String id, IModel<List<FileUpload>> model) {
+        return new BSCustomFileUploadField(id, model);
+    }
+
+    protected String getClearIconStyleClass() {
+        return getString(KEY_CLEAR_ICON, null, "");
+    }
+
+    protected String getDownloadUrl(IFileRef fileRef) {
+        final ResourceReference resRef = SessionScopedTempFileDownloadResource.getReference(getApplication());
+        final PageParameters params = new PageParameters().set("id", fileRef.getId());
+        return urlFor(resRef, params).toString();
+    }
+
+    protected String getFileDescription(IFileRef fileRef) {
+        if (fileRef == null)
+            return null;
+        return String.format("%s [%s]", fileRef.getName(), Bytes.bytes(fileRef.getSize()));
+    }
+
     //@formatter:off
     private List<FileUpload> getFileList() { return fileList; }
     private IFileRef         getFileRef()  { return fileRef ; }
@@ -166,6 +199,16 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
     @Override public BSCustomFileField setModelObject(IFileRef        object) { return (BSCustomFileField) super.setModelObject(object); }
     //@formatter:on
 
+    protected class ClearIcon extends Label {
+        protected ClearIcon(String id) {
+            super(id, "");
+        }
+        @Override
+        protected void onComponentTag(ComponentTag tag) {
+            super.onComponentTag(tag);
+            tag.put("class", defaultString(tag.getAttribute("class")) + " " + getClearIconStyleClass());
+        }
+    }
     private final class FileListModel implements IModel<List<FileUpload>> {
         @Override
         public List<FileUpload> getObject() {
@@ -190,7 +233,7 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
     }
 
     protected class UploadBehavior extends AjaxFormSubmitBehavior {
-        protected UploadBehavior(String event) {
+        protected UploadBehavior(Form<?> form, String event) {
             super(form, event);
         }
         @Override
@@ -205,7 +248,7 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
             super.renderHead(component, response);
             response.render(OnDomReadyHeaderItem.forScript(
                 $(input)
-                    .on("change", $(input).trigger("delayedsubmit").asFunction())
+                    .on("change", $(input).trigger(EVENT_DELAYEDSUBMIT).asFunction())
                     .on("click", $(input).each("function(){ this.value=null; }").asFunction())));
         }
         @Override
@@ -215,7 +258,7 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
                 oldFileRef.invalidate();
 
             if (getFileList() != null && !getFileList().isEmpty()) {
-                final ITempFileManager fileman = WystriConfiguration.get().getTempFileManager();
+                final ITempFileManager fileman = Wystri.get().getTempFileManager();
                 final FileUpload fu = getFileList().get(0);
 
                 try {
@@ -228,7 +271,7 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
                         }
                     }
 
-                    target.add(form);
+                    target.add(this.getForm());
                     onUploadComplete(target);
 
                 } catch (SecurityException | IllegalArgumentException | IOException ex) {
@@ -242,30 +285,4 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
             onUploadError(target, Optional.empty());
         }
     }
-
-    protected Optional<File> resolveFile(final FileUpload fu) {
-        try {
-            if (fu instanceof CustomFileUpload) {
-                CustomFileUpload cfu = (CustomFileUpload) fu;
-                CustomDiskFileItem fileItem = cfu.getItem();
-                return Optional.of(fileItem.getTempFile());
-            } else {
-                return Optional.empty();
-            }
-        } catch (SecurityException | IllegalArgumentException ex) {
-            return Optional.empty();
-        }
-    }
-
-    protected class ClearLink extends AjaxLink<Void> {
-        protected ClearLink(String id) {
-            super(id);
-        }
-        @Override
-        public void onClick(AjaxRequestTarget target) {
-            onClear(target);
-            target.add(form);
-        }
-    }
-
 }

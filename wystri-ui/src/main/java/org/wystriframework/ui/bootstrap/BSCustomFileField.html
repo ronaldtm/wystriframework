@@ -13,7 +13,10 @@
   <div wicket:id="linkGroup" class="input-group">
     <a wicket:id="link" class="form-control form-control-sm"></a>
     <div class="input-group-append">
-      <button wicket:id="clear" type="button" class="btn btn-outline-secondary btn-sm"><i class="fas fa-times text-dark"/> Limpar</button>
+      <button wicket:id="clearLink" type="button" class="btn btn-outline-secondary btn-sm">
+        <i wicket:id="clearIcon" class="text-dark"></i>
+        <wicket:message key="BSCustomFileField.clear.label"></wicket:message>
+      </button>
     </div>
   </div>
   <div wicket:id="progress" style="display:none;margin-top:1px;height:2px;"></div>

@@ -5,7 +5,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.wystriframework.core.definition.IField;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
 
@@ -19,7 +19,7 @@ public class IntegerFieldAppender extends AbstractFieldComponentAppender<Integer
             protected void reportRequiredError() {
                 final String msg = field.requiredError(ctx.getRecord().getObject());
                 if (isNotBlank(msg)) {
-                    super.error(WystriConfiguration.get().localizedString(msg));
+                    super.error(Wystri.get().localizedString(msg));
                 } else {
                     super.reportRequiredError();
                 }

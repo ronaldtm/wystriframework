@@ -6,10 +6,12 @@ public interface IFieldView<E, T> extends Serializable {
 
     IField<E, T> getField();
     
-    T getPreviousValue();
     T getValue();
     void setValue(T value);
     
+    void saveSnapshotValue();
+    T getSnapshotValue();
+
     void setRequired(boolean required);
     void setVisible(boolean visible);
     void setEnabled(boolean enabled);

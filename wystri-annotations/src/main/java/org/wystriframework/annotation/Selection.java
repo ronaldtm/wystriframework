@@ -8,11 +8,11 @@ import java.lang.annotation.Target;
 import org.wystriframework.core.definition.IOptionsProvider;
 
 @Target({
-    ElementType.FIELD,
-    ElementType.ANNOTATION_TYPE
+    ElementType.FIELD
 })
 @Retention(RetentionPolicy.RUNTIME)
 @SuppressWarnings("rawtypes")
+@Field
 public @interface Selection {
 
     String[] value() default {};

@@ -3,7 +3,6 @@ package org.wystriframework.annotation.impl;
 import static java.util.Arrays.*;
 import static java.util.stream.Collectors.*;
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.wystriframework.core.util.ReflectionUtils.*;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -20,6 +19,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.apache.wicket.core.util.lang.PropertyResolver;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
+import org.wystriframework.annotation.Bool;
 import org.wystriframework.annotation.Constraint;
 import org.wystriframework.annotation.ConstraintFor;
 import org.wystriframework.annotation.CustomView;
@@ -35,15 +35,16 @@ import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.util.IBeanLookup;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.form.formbuilder.IFieldComponentAppender;
 
 public class AnnotatedField<E, F> implements IField<E, F> {
 
-    private final AnnotatedEntity<E> entity;
-    private final String             name;
+    private final AnnotatedEntity<E>   entity;
+    private final String               name;
 
-    private final IFieldDelegate<E, F>  delegate;
+    private final IFieldDelegate<E, F> delegate;
 
     public static <E> AnnotatedField<E, ?> newSimpleField(AnnotatedEntity<E> entity, java.lang.reflect.Field field) {
         return new AnnotatedField<>(entity, field);
@@ -101,9 +102,9 @@ public class AnnotatedField<E, F> implements IField<E, F> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private List<IConstraint<? super F>> resolveAnnotationConstraints() {
         List<IConstraint<? super F>> constraints = new ArrayList<>();
-        List<Annotation> annotations = getAnnotatedAnnotations(getDeclaredField(), Constraint.class);
+        List<Annotation> annotations = Utils.getAnnotatedAnnotations(getDeclaredField(), Constraint.class);
         for (Annotation annotation : annotations) {
-            Constraint constraint = getMetaAnnotation(annotation, Constraint.class);
+            Constraint constraint = Utils.getMetaAnnotation(annotation, Constraint.class);
 
             Class<? extends IConstraint> implType = constraint.type();
             IConstraint<? super F> impl = WystriConfiguration.get().getBeanLookup().byType(implType);
@@ -136,7 +137,7 @@ public class AnnotatedField<E, F> implements IField<E, F> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private List<IConstraint<? super F>> resolveMethodConstraints(IRecord record) {
         final List<IConstraint<? super F>> constraints = new ArrayList<>();
-        final List<Pair<String, Class<?>[]>> constraintMethodSpecs = getAnnotatedMethods(entity.getObjectClass(), ConstraintFor.class).stream()
+        final List<Pair<String, Class<?>[]>> constraintMethodSpecs = Utils.getAnnotatedMethods(entity.getObjectClass(), ConstraintFor.class).stream()
             .map(it -> Pair.of(it.getName(), it.getParameterTypes()))
             .collect(toList());
         for (Pair<String, Class<?>[]> methodSpec : constraintMethodSpecs) {
@@ -169,7 +170,7 @@ public class AnnotatedField<E, F> implements IField<E, F> {
 
             } else if (selection.options().length > 0) {
                 final Class<F> type = this.getType();
-                final IConverter<F> converter = WystriConfiguration.get().getConverter(type);
+                final IConverter<F> converter = Wystri.get().getConverter(type);
 
                 List<Triple<String, F, String>> opcoes = new ArrayList<>();
                 for (Option option : selection.options()) {
@@ -215,7 +216,7 @@ public class AnnotatedField<E, F> implements IField<E, F> {
 
             } else if (selection.value().length > 0) {
                 final Class<F> type = this.getType();
-                final IConverter<F> converter = WystriConfiguration.get().getConverter(type);
+                final IConverter<F> converter = Wystri.get().getConverter(type);
 
                 List<String> opcoes = new ArrayList<>(asList(selection.value()));
                 return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(new IOptionsProvider<E, F>() {
@@ -251,13 +252,13 @@ public class AnnotatedField<E, F> implements IField<E, F> {
     }
 
     public <A extends Annotation> A getFieldAnnotation(Class<A> annotationClass) {
-        return resolveAnnotation(getDeclaredField(), annotationClass);
+        return Utils.resolveAnnotation(getDeclaredField(), annotationClass);
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private static <E> boolean testPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
         if (!Modifier.isAbstract(predicateClass.getModifiers())) {
-            Type[] argTypes = getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
+            Type[] argTypes = Utils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
             if (argTypes[0] == AnnotatedRecord.class) {
                 SerializablePredicate<AnnotatedRecord<E>> predicate = lookup().byType(predicateClass);
                 return predicate.test(arecord);

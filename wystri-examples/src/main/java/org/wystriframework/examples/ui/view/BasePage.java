@@ -1,14 +1,11 @@
 package org.wystriframework.examples.ui.view;
 
 import org.apache.wicket.ajax.IAjaxIndicatorAware;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.wystriframework.core.wicket.WystriConfiguration;
 
 public class BasePage extends WebPage implements IAjaxIndicatorAware {
     private static final long        serialVersionUID = 1L;
@@ -20,14 +17,6 @@ public class BasePage extends WebPage implements IAjaxIndicatorAware {
     }
     public BasePage(final IModel<?> model) {
         super(model);
-    }
-
-    @Override
-    public void renderHead(IHeaderResponse response) {
-        super.renderHead(response);
-        response.render(JavaScriptHeaderItem.forReference(getApplication().getJavaScriptLibrarySettings().getJQueryReference()));
-
-        WystriConfiguration.get().getHeaderContributor().renderHead(response);
     }
 
     @Override

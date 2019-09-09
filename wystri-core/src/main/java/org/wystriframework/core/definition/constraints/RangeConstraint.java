@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import org.wystriframework.core.definition.IConstrainable;
 import org.wystriframework.core.definition.IConverter;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 
 import com.google.common.collect.Range;
 
@@ -20,7 +20,7 @@ public class RangeConstraint<T extends Comparable<T>> implements ISimpleConstrai
     @Override
     public String checkSimple(IConstrainable<T> c) {
         final Range<T> range = (isNotBlank(rangeExpression))
-            ? parseRangeExpression(rangeExpression, WystriConfiguration.get().getConverter(c.getType()))
+            ? parseRangeExpression(rangeExpression, Wystri.get().getConverter(c.getType()))
             : Range.all();
         return range.contains(c.getValue()) ? null : "RangeConstraint.range";
     }

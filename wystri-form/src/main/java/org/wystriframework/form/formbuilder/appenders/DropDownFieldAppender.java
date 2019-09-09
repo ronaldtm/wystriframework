@@ -13,7 +13,7 @@ import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.FormComponentFieldView;
@@ -54,7 +54,7 @@ public class DropDownFieldAppender<T> extends AbstractFieldComponentAppender<T> 
             protected void reportRequiredError() {
                 final String msg = field.requiredError(recordModel.getObject());
                 if (isNotBlank(msg)) {
-                    super.error(WystriConfiguration.get().localizedString(msg));
+                    super.error(Wystri.get().localizedString(msg));
                 } else {
                     super.reportRequiredError();
                 }

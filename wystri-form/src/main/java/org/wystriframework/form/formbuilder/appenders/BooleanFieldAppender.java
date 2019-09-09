@@ -14,11 +14,11 @@ import org.apache.wicket.model.IModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
-import org.wystriframework.form.formbuilder.RecordModel;
-import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.form.formbuilder.FormComponentFieldView;
+import org.wystriframework.form.formbuilder.RecordModel;
 
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
@@ -75,7 +75,7 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
             protected void reportRequiredError() {
                 final String msg = ifield.requiredError(record.getObject());
                 if (isNotBlank(msg)) {
-                    super.error(WystriConfiguration.get().localizedString(msg));
+                    super.error(Wystri.get().localizedString(msg));
                 } else {
                     super.reportRequiredError();
                 }

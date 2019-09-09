@@ -24,13 +24,14 @@ import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
+import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.WystriWicketUtils;
 import org.wystriframework.form.formbuilder.appenders.BooleanFieldAppender;
 import org.wystriframework.form.formbuilder.appenders.CheckboxFieldAppender;
 import org.wystriframework.form.formbuilder.appenders.DropDownFieldAppender;
 import org.wystriframework.form.formbuilder.appenders.FileUploadFieldAppender;
 import org.wystriframework.form.formbuilder.appenders.IntegerFieldAppender;
 import org.wystriframework.form.formbuilder.appenders.StringFieldAppender;
-import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 import org.wystriframework.ui.bootstrap.BSFormRowLayout;
 import org.wystriframework.ui.bootstrap.BSFormSectionListView;
@@ -70,9 +71,9 @@ public class EntityFormBuilder implements Serializable {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private <E, F> IFieldView<E, F> appendField(FieldComponentContext<E, F> ctx) {
-        return getAppender(ctx.getField(), DEFAULT_APPENDER)
-            .append(ctx);
+    private <E, F> void appendField(FieldComponentContext<E, F> ctx) {
+        final IFieldView<E, F> fieldView = getAppender(ctx.getField(), DEFAULT_APPENDER).append(ctx);
+        WystriWicketUtils.setFieldView(ctx.getFormGroup(), fieldView);
     }
 
     @SuppressWarnings("unchecked")

@@ -19,7 +19,7 @@ import org.wystriframework.core.definition.IConstraint;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 import org.wystriframework.ui.bootstrap.BSValidationStatusBehavior;
 
@@ -81,8 +81,8 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
     }
 
     private class OnAfterProcessedBehavior<E> extends Behavior {
-        private final IField<E, T>                      field;
-        private final IFieldView<E, T>                  fieldView;
+        private final IField<E, T>                         field;
+        private final IFieldView<E, T>                     fieldView;
         private final RecordModel<? extends IRecord<E>, E> record;
         protected OnAfterProcessedBehavior(IField<E, T> field, IFieldView<E, T> fieldView, RecordModel<? extends IRecord<E>, E> record) {
             this.field = field;
@@ -144,7 +144,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
             map.putAll(args);
 
             IModel<? extends Map<String, Object>> argsModel = Model.of(map);
-            validatable.error(new ValidationError(WystriConfiguration.get().localizedString(key, argsModel))
+            validatable.error(new ValidationError(Wystri.get().localizedString(key, argsModel))
                 .setVariables(args));
         }
     }
@@ -156,7 +156,7 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         }
         @Override
         public String getObject() {
-            return WystriConfiguration.get().localizedString(field.getLabel());
+            return Wystri.get().localizedString(field.getLabel());
         }
     }
 }

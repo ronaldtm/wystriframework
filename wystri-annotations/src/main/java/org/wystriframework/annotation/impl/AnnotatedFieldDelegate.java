@@ -10,7 +10,7 @@ import org.wystriframework.core.definition.IConverter;
 import org.wystriframework.core.definition.IFieldDelegate;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.definition.IRecord;
-import org.wystriframework.core.util.ReflectionUtils;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 
 public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
@@ -31,19 +31,19 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
 
     @SuppressWarnings("unchecked")
     protected void processValueChanged(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        if (!Objects.equals(view.getPreviousValue(), view.getValue()))
+        if (!Objects.equals(view.getSnapshotValue(), view.getValue()))
             view.markDirty();
     }
 
     @SuppressWarnings("unchecked")
     protected void processRequired(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
+        final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
         view.setRequired(afield.isRequired(arecord));
     }
 
     @SuppressWarnings("unchecked")
     protected void processVisible(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        boolean visible = processPredicate(arecord, field.visibleIf(), true);
+        final boolean visible = processPredicate(arecord, field.visibleIf(), true);
         if (!visible && !Field.KEEP_VALUE.equals(field.invisibleDefaultValue()))
             view.setValue(converter(view, field.invisibleDefaultValue()));
         view.setVisible(visible);
@@ -51,26 +51,25 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
 
     @SuppressWarnings("unchecked")
     protected void processEnabled(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
-        boolean enabled = processPredicate(arecord, field.enabledIf(), true);
+        final boolean enabled = processPredicate(arecord, field.enabledIf(), true);
         if (!enabled && !Field.KEEP_VALUE.equals(field.disabledDefaultValue()))
             view.setValue(converter(view, field.disabledDefaultValue()));
         view.setEnabled(enabled);
     }
 
     private static <E, F> F converter(IFieldView<E, F> view, String value) {
-        IConverter<? extends F> converter = WystriConfiguration.get().getConverter(view.getType());
+        final IConverter<? extends F> converter = Wystri.get().getConverter(view.getType());
         return (converter != null) ? converter.stringToObject(value) : null;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected static <E> boolean processPredicate(final AnnotatedRecord<E> arecord, Class<? extends SerializablePredicate> predicateClass, boolean defaultValue) {
         if (!Modifier.isAbstract(predicateClass.getModifiers())) {
-            Type[] argTypes = ReflectionUtils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
+            final SerializablePredicate predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
+            final Type[] argTypes = Utils.getGenericTypesForInterface(predicateClass, SerializablePredicate.class);
             if (argTypes[0] == AnnotatedRecord.class) {
-                SerializablePredicate<AnnotatedRecord<E>> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
                 return predicate.test(arecord);
             } else {
-                SerializablePredicate<E> predicate = WystriConfiguration.get().getBeanLookup().byType(predicateClass);
                 return predicate.test(arecord.getTargetObject());
             }
         }

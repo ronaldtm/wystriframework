@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 import org.wystriframework.annotation.impl.AnnotatedFieldDelegate;
-import org.wystriframework.annotation.impl.Bool;
 import org.wystriframework.core.definition.IFieldDelegate;
 
 @Target({

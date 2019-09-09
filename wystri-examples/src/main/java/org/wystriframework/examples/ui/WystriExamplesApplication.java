@@ -11,13 +11,11 @@ import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
 import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
-import org.springframework.stereotype.Component;
 import org.wystriframework.core.wicket.WystriConfiguration;
-import org.wystriframework.ui.component.fileupload.CustomDiskFileItemFactory;
-import org.wystriframework.examples.ui.view.crudgen.CrudgenDemoPage;
 import org.wystriframework.examples.ui.view.home.HomePage;
+import org.wystriframework.ui.component.fileupload.CustomDiskFileItemFactory;
 
-@Component
+@org.springframework.stereotype.Component
 public class WystriExamplesApplication extends WebApplication {
 
     @Override
@@ -31,8 +29,6 @@ public class WystriExamplesApplication extends WebApplication {
         WystriConfiguration.get().setBeanLookup(new SpringBeanLookup(this));
 
         mountPage("home", HomePage.class);
-
-        mountPage("crudgen", CrudgenDemoPage.class);
     }
 
     @Override

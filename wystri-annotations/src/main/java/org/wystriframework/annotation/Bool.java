@@ -1,4 +1,4 @@
-package org.wystriframework.annotation.impl;
+package org.wystriframework.annotation;
 
 public enum Bool {
     TRUE, FALSE, UNDEFINED;

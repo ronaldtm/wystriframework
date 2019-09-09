@@ -26,7 +26,7 @@ public class AnnotatedEntity<E> implements IEntity<E> {
     @Override
     public Stream<AnnotatedField<E, ?>> fields() {
         return ReflectionUtils.allDeclaredFields(getObjectClass())
-            .filter(field -> ReflectionUtils.isAnnotationPresent(field, Field.class))
+            .filter(field -> Utils.isAnnotationPresent(field, Field.class))
             .map(field -> new AnnotatedField<>(this, field));
     }
 

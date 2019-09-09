@@ -10,7 +10,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.definition.constraints.LengthConstraint;
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.RecordModel;
@@ -35,7 +35,7 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
             protected void reportRequiredError() {
                 final String msg = field.requiredError(record.getObject());
                 if (isNotBlank(msg)) {
-                    super.error(WystriConfiguration.get().localizedString(msg));
+                    super.error(Wystri.get().localizedString(msg));
                 } else {
                     super.reportRequiredError();
                 }

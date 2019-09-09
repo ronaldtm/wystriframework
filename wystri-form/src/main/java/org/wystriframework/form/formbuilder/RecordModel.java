@@ -1,5 +1,7 @@
 package org.wystriframework.form.formbuilder;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.wicket.Component;
 import org.apache.wicket.model.IComponentInheritedModel;
 import org.apache.wicket.model.IModel;
@@ -9,9 +11,9 @@ import org.wystriframework.core.definition.IRecord;
 
 public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, IComponentInheritedModel<R> {
 
-    public class FieldModel<F> implements IModel<F>, ISnapshotModel<F> {
-        private final IField<E, F> field;
-        private transient F        snapshot;
+    public class FieldModel<F> implements IModel<F> {
+        private final IField<E, F>           field;
+        private transient AtomicReference<F> snapshot;
         public FieldModel(IField<E, F> field) {
             this.field = field;
         }
@@ -21,16 +23,14 @@ public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, ICompone
         }
         @Override
         public void setObject(F object) {
-            this.snapshot = getObject();
+            if (this.snapshot == null)
+                this.snapshot = new AtomicReference<>(getObject());
             RecordModel.this.getObject().setValue(field, object);
         }
         @Override
         public void detach() {
             RecordModel.this.detach();
-        }
-        @Override
-        public F getLastSnapshot() {
-            return this.snapshot;
+            this.snapshot = null;
         }
     }
 

@@ -3,7 +3,7 @@ package org.wystriframework.core.util;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import org.wystriframework.core.wicket.WystriConfiguration;
+import org.wystriframework.core.wicket.Wystri;
 
 public interface IBeanLookup {
 
@@ -20,7 +20,7 @@ public interface IBeanLookup {
             Class<?>[] argTypes = con.getParameterTypes();
             Object[] convertedArgs = new Object[args.length];
             for (int i = 0; i < args.length; i++) {
-                convertedArgs[i] = WystriConfiguration.get().getConverter(argTypes[i]).stringToObject(args[i]);
+                convertedArgs[i] = Wystri.get().getConverter(argTypes[i]).stringToObject(args[i]);
             }
             try {
                 return (T) con.newInstance(convertedArgs);
