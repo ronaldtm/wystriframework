@@ -4,12 +4,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.markup.head.IHeaderResponse;
-import org.apache.wicket.markup.head.JavaScriptHeaderItem;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.wystriframework.annotation.impl.AnnotatedRecordModel;
-import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.examples.command.SampleCommand;
 import org.wystriframework.examples.ui.view.BasePage;
 import org.wystriframework.form.crudgen.view.wicket.CrudgenPanel;
@@ -57,11 +54,4 @@ public class HomePage extends BasePage {
 
             .add(new EntityFormProcessorBehavior()));
     }
-
-//    @Override
-//    public void renderHead(IHeaderResponse response) {
-//        super.renderHead(response);
-//        response.render(JavaScriptHeaderItem.forReference(getApplication().getJavaScriptLibrarySettings().getJQueryReference()));
-//        WystriConfiguration.get().getHeaderContributor().renderHead(response);
-//    }
 }

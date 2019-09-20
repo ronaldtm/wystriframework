@@ -10,8 +10,8 @@ import org.wystriframework.core.util.NewInstanceBeanLookup;
 
 public class WystriConfiguration {
 
-    private static final String          DEFAULT_BOOTSTRAP_JS_URL  = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js";
     private static final String          DEFAULT_BOOTSTRAP_CSS_URL = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css";
+    private static final String          DEFAULT_BOOTSTRAP_JS_URL  = "https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js";
     private SerializableSupplier<String> bootstrapCssUrl           = () -> DEFAULT_BOOTSTRAP_CSS_URL;
     private SerializableSupplier<String> bootstrapJsUrl            = () -> DEFAULT_BOOTSTRAP_JS_URL;
 
