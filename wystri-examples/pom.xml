@@ -17,7 +17,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <wicket.version>8.9.0</wicket.version>
-    <spring.version>5.1.4.RELEASE</spring.version>
+    <spring.version>5.3.18</spring.version>
     <jetty9.version>9.4.34.v20201102</jetty9.version>
     <slf4j.version>1.7.25</slf4j.version>
     <p6spy.version>3.3.0</p6spy.version>
