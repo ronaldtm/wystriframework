@@ -2,6 +2,7 @@ package org.wystriframework.ui.component.model;
 
 import org.apache.wicket.model.IObjectClassAwareModel;
 
+@SuppressWarnings("serial")
 public final class NullModel<T> implements IObjectClassAwareModel<T> {
     private final Class<T> type;
     public NullModel(Class<T> type) {

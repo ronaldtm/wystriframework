@@ -9,6 +9,7 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.RecordModel;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 
+@SuppressWarnings("serial")
 public class CheckboxFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
     @Override
@@ -19,7 +20,6 @@ public class CheckboxFieldAppender extends AbstractFieldComponentAppender<Boolea
         return newBooleanCheckField(ctx.getRecord(), ifield);
     }
 
-    @SuppressWarnings("unchecked")
     private <E> FormComponent<Boolean> newBooleanCheckField(final RecordModel<? extends IRecord<E>, E> record, IField<E, Boolean> field) {
         return new CheckBox(field.getName(), record.field(field));
     }

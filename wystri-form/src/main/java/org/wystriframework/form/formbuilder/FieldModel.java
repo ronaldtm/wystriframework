@@ -5,6 +5,7 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
+@SuppressWarnings("serial")
 public class FieldModel<E, T> implements IModel<T>, IWrapModel<T> {
 
     private final IModel<IRecord<E>> recordModel;

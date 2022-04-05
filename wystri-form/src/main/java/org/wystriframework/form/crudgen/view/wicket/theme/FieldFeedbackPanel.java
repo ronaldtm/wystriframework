@@ -6,6 +6,7 @@ import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.feedback.FencedFeedbackPanel;
 import org.apache.wicket.markup.ComponentTag;
 
+@SuppressWarnings("serial")
 public class FieldFeedbackPanel extends FencedFeedbackPanel {
     public FieldFeedbackPanel(String id, Component fence) {
         super(id, fence);

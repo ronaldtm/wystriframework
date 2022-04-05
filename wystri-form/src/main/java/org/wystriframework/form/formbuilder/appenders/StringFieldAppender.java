@@ -16,6 +16,7 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.RecordModel;
 import org.wystriframework.ui.util.IBehaviorShortcutsMixin;
 
+@SuppressWarnings("serial")
 public class StringFieldAppender extends AbstractFieldComponentAppender<String> {
 
     @Override
@@ -28,7 +29,6 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
             : newStringField(ctx.getRecord(), stringField);
     }
 
-    @SuppressWarnings("unchecked")
     private <E> FormComponent<String> newStringField(final RecordModel<? extends IRecord<E>, E> record, IField<E, String> field) {
         return new TextField<String>(field.getName(), record.field(field)) {
             @Override
@@ -43,7 +43,6 @@ public class StringFieldAppender extends AbstractFieldComponentAppender<String> 
         };
     }
 
-    @SuppressWarnings("unchecked")
     private <E> FormComponent<String> newLongStringField(final RecordModel<? extends IRecord<E>, E> record, IField<E, String> field) {
         final TextArea<String> comp = new TextArea<>(field.getName(), record.field(field));
         comp.add(IBehaviorShortcutsMixin.$b.attrAppend("rows", "5"));

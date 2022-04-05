@@ -19,10 +19,10 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.FormComponentFieldView;
 import org.wystriframework.form.formbuilder.RecordModel;
 
+@SuppressWarnings("serial")
 public class DropDownFieldAppender<T> extends AbstractFieldComponentAppender<T> {
 
     @Override
-    @SuppressWarnings("unchecked")
     protected <E> FormComponent<T> newFormComponent(FieldComponentContext<E, T> ctx) {
 
         final IField<E, T> field = (IField<E, T>) ctx.getField();

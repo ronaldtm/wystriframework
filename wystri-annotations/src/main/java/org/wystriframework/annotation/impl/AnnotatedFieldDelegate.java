@@ -13,10 +13,10 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 
+@SuppressWarnings("serial")
 public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onAfterProcessed(IFieldView<E, F> view, IRecord<E> record) {
 
         final AnnotatedRecord<E> arecord = (AnnotatedRecord<E>) record;
@@ -29,19 +29,16 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
         processEnabled(view, arecord, field);
     }
 
-    @SuppressWarnings("unchecked")
     protected void processValueChanged(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         if (!Objects.equals(view.getSnapshotValue(), view.getValue()))
             view.markDirty();
     }
 
-    @SuppressWarnings("unchecked")
     protected void processRequired(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) view.getField();
         view.setRequired(afield.isRequired(arecord));
     }
 
-    @SuppressWarnings("unchecked")
     protected void processVisible(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         final boolean visible = processPredicate(arecord, field.visibleIf(), true);
         if (!visible && !Field.KEEP_VALUE.equals(field.invisibleDefaultValue()))
@@ -49,7 +46,6 @@ public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
         view.setVisible(visible);
     }
 
-    @SuppressWarnings("unchecked")
     protected void processEnabled(IFieldView<E, F> view, final AnnotatedRecord<E> arecord, final Field field) {
         final boolean enabled = processPredicate(arecord, field.enabledIf(), true);
         if (!enabled && !Field.KEEP_VALUE.equals(field.disabledDefaultValue()))

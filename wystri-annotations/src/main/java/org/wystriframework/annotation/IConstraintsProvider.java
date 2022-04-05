@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.wystriframework.core.definition.IConstraint;
 
+@SuppressWarnings("serial")
 public interface IConstraintsProvider extends Serializable {
 
     static class NoopConstraintProvider implements IConstraintsProvider {

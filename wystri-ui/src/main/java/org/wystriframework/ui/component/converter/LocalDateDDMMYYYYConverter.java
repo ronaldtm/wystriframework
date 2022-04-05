@@ -7,6 +7,7 @@ import java.util.Locale;
 import org.apache.wicket.util.convert.ConversionException;
 import org.apache.wicket.util.convert.IConverter;
 
+@SuppressWarnings("serial")
 public class LocalDateDDMMYYYYConverter implements IConverter<LocalDate> {
 
     private static final DateTimeFormatter ddMMyyyy = DateTimeFormatter.ofPattern("dd/MM/yyyy");

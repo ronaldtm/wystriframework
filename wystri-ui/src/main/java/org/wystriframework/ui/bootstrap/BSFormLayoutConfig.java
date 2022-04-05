@@ -6,6 +6,7 @@ import org.apache.wicket.Application;
 import org.apache.wicket.Session;
 import org.apache.wicket.util.convert.IConverter;
 
+@SuppressWarnings("serial")
 public class BSFormLayoutConfig implements Serializable {
 
     private BSSize componentsSize;

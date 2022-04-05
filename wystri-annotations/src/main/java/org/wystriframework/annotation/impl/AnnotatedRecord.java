@@ -3,6 +3,7 @@ package org.wystriframework.annotation.impl;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
+@SuppressWarnings("serial")
 public class AnnotatedRecord<E> implements IRecord<E> {
 
     private final AnnotatedEntity<E> entity;
@@ -29,14 +30,12 @@ public class AnnotatedRecord<E> implements IRecord<E> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <F> F getValue(IField<E, F> field) {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) field;
         return afield.getValue(object);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <F> void setValue(IField<E, F> field, F value) {
         final AnnotatedField<E, F> afield = (AnnotatedField<E, F>) field;
         afield.setValue(object, value);

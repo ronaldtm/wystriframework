@@ -9,6 +9,7 @@ import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.wystriframework.ui.util.WicketComponentUtils;
 
+@SuppressWarnings("serial")
 public class BSProgressBar extends UploadProgressBar {
 
     public BSProgressBar(String id, Form<?> form) {

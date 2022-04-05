@@ -24,6 +24,7 @@ public class WystriExamplesApplication extends WebApplication {
 
         getComponentInstantiationListeners().add(new SpringComponentInjector(this));
         getResourceSettings().setThrowExceptionOnMissingResource(false);
+        getCspSettings().blocking().disabled();
         getApplicationSettings().setUploadProgressUpdatesEnabled(true);
 
         WystriConfiguration.get().setBeanLookup(new SpringBeanLookup(this));

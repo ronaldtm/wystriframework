@@ -16,6 +16,7 @@ import org.wystriframework.annotation.FormLayout;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldLayout;
 
+@SuppressWarnings("serial")
 public class AnnotatedFieldLayout<E> implements IFieldLayout<E> {
 
     private final AnnotatedEntity<E> entity;

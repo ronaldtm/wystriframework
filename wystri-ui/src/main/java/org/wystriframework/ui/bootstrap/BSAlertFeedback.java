@@ -7,6 +7,7 @@ import org.apache.wicket.feedback.IFeedbackMessageFilter;
 import org.apache.wicket.markup.ComponentTag;
 import org.wystriframework.ui.util.WicketComponentUtils;
 
+@SuppressWarnings("serial")
 public class BSAlertFeedback extends FencedFeedbackPanel {
 
     public BSAlertFeedback(String id, Component fence, IFeedbackMessageFilter filter) {

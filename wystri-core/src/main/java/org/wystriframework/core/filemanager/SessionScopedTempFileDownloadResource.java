@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.time.Duration;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,14 +17,14 @@ import org.apache.wicket.request.resource.AbstractResource;
 import org.apache.wicket.request.resource.ContentDisposition;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.io.IOUtils;
-import org.apache.wicket.util.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wystriframework.core.definition.IFileRef;
 
+@SuppressWarnings("serial")
 public class SessionScopedTempFileDownloadResource extends AbstractResource {
 
-    private static final Logger log = LoggerFactory.getLogger(SessionScopedTempFileDownloadResource.class);
+	private static final Logger log = LoggerFactory.getLogger(SessionScopedTempFileDownloadResource.class);
 
     public static final synchronized ResourceReference getReference(Application application) {
         final SharedResources sharedResources = application.getSharedResources();
@@ -46,7 +47,7 @@ public class SessionScopedTempFileDownloadResource extends AbstractResource {
             if (fileRef != null) {
                 final ResourceResponse resp = new ResourceResponse()
                     .setContentDisposition(ContentDisposition.INLINE)
-                    .setCacheDuration(Duration.NONE);
+                    .setCacheDuration(Duration.ZERO);
 
                 return resp
                     .setFileName(fileRef.getName())

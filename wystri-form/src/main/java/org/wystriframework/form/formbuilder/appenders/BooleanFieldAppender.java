@@ -20,6 +20,7 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.FormComponentFieldView;
 import org.wystriframework.form.formbuilder.RecordModel;
 
+@SuppressWarnings("serial")
 public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
     private static final String TRUE_VALUE  = "Y";
@@ -43,7 +44,6 @@ public class BooleanFieldAppender extends AbstractFieldComponentAppender<Boolean
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected <E> FormComponent<Boolean> newFormComponent(FieldComponentContext<E, Boolean> ctx) {
 
         final IField<E, Boolean> ifield = (IField<E, Boolean>) ctx.getField();

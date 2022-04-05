@@ -10,6 +10,7 @@ import org.apache.wicket.util.io.IOUtils;
 import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.ui.util.WicketComponentUtils;
 
+@SuppressWarnings("serial")
 public class FileResourceLink<T extends IFileRef> extends ResourceLink<T> {
 
     public FileResourceLink(String id, IModel<T> model) {

@@ -39,6 +39,7 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.form.formbuilder.IFieldComponentAppender;
 
+@SuppressWarnings("serial")
 public class AnnotatedField<E, F> implements IField<E, F> {
 
     private final AnnotatedEntity<E>   entity;
@@ -63,7 +64,6 @@ public class AnnotatedField<E, F> implements IField<E, F> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean isRequired(IRecord<E> record) {
         final Field field = getFieldAnnotation(Field.class);
         if (field.required() != Bool.UNDEFINED) {
@@ -80,13 +80,11 @@ public class AnnotatedField<E, F> implements IField<E, F> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean isEnabled(IRecord<E> record) {
         return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).enabledIf(), true);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public boolean isVisible(IRecord<E> record) {
         return testPredicate((AnnotatedRecord<E>) record, getFieldAnnotation(Field.class).visibleIf(), true);
     }
@@ -182,7 +180,6 @@ public class AnnotatedField<E, F> implements IField<E, F> {
                 }
                 return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(new IOptionsProvider<E, F>() {
                     @Override
-                    @SuppressWarnings("unchecked")
                     public List<F> getOptions(IRecord<E> record) {
                         return opcoes.stream()
                             .map(it -> it.getMiddle())
@@ -221,7 +218,6 @@ public class AnnotatedField<E, F> implements IField<E, F> {
                 List<String> opcoes = new ArrayList<>(asList(selection.value()));
                 return (Optional<? extends IOptionsProvider<E, F>>) Optional.of(new IOptionsProvider<E, F>() {
                     @Override
-                    @SuppressWarnings("unchecked")
                     public List<F> getOptions(IRecord<E> record) {
                         return opcoes.stream()
                             .map(it -> converter.stringToObject(it))

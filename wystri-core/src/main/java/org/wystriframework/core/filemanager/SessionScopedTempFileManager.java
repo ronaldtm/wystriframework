@@ -21,6 +21,7 @@ import org.apache.wicket.Session;
 import org.apache.wicket.util.io.Streams;
 import org.wystriframework.core.definition.IFileRef;
 
+@SuppressWarnings("serial")
 public class SessionScopedTempFileManager implements ITempFileManager {
 
     private static final MetaDataKey<Map<String, SessionScopedTempFileManager>> APPLICATION_METADATA_KEY = new MetaDataKey<Map<String, SessionScopedTempFileManager>>() {};

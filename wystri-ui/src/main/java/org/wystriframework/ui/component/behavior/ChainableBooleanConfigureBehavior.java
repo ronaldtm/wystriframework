@@ -5,6 +5,7 @@ import org.apache.wicket.behavior.Behavior;
 import org.danekja.java.util.function.serializable.SerializableBiConsumer;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 
+@SuppressWarnings("serial")
 abstract class ChainableBooleanConfigureBehavior<B extends ChainableBooleanConfigureBehavior<B>> extends Behavior {
     private final SerializablePredicate<Component>     predicate;
     private SerializableBiConsumer<Component, Boolean> after = (c, b) -> {};

@@ -6,6 +6,7 @@ import org.apache.wicket.feedback.FeedbackMessage;
 import org.apache.wicket.markup.ComponentTag;
 import org.wystriframework.ui.util.WicketComponentUtils;
 
+@SuppressWarnings("serial")
 public class BSValidationStatusBehavior extends Behavior {
 
     private static final BSValidationStatusBehavior INSTANCE = new BSValidationStatusBehavior();

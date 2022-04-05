@@ -5,9 +5,9 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.event.IEvent;
 
+@SuppressWarnings("serial")
 public class EntityFormProcessorBehavior extends Behavior {
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onEvent(Component component, IEvent<?> event) {
         Object payload = event.getPayload();

@@ -39,6 +39,7 @@ import org.wystriframework.ui.bootstrap.IBSFormGroupLayout;
 
 import com.google.common.collect.ImmutableMap;
 
+@SuppressWarnings("serial")
 public class EntityFormBuilder implements Serializable {
 
     private static final SerializableSupplier<IFieldComponentAppender<?>> DEFAULT_APPENDER = StringFieldAppender::new;
@@ -70,7 +71,6 @@ public class EntityFormBuilder implements Serializable {
         return sectionsView;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     private <E, F> void appendField(FieldComponentContext<E, F> ctx) {
         final IFieldView<E, F> fieldView = getAppender(ctx.getField(), DEFAULT_APPENDER).append(ctx);
         WystriWicketUtils.setFieldView(ctx.getFormGroup(), fieldView);
@@ -96,7 +96,7 @@ public class EntityFormBuilder implements Serializable {
         .put(IFileRef.class, FileUploadFieldAppender::new)
         .build());
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     protected <E, F> Optional<IFieldComponentAppender<F>> findAppender(IField<E, F> field) {
 
         Optional<? extends IOptionsProvider<E, F>> op = field.getOptionsProvider();

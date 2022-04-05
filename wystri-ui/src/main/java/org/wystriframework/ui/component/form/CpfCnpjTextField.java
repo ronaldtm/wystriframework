@@ -9,6 +9,7 @@ import org.apache.wicket.util.convert.IConverter;
 import org.wystriframework.ui.component.behavior.textmask.TextMaskBehavior;
 import org.wystriframework.ui.component.validator.CpfCnpjValidator;
 
+@SuppressWarnings("serial")
 public class CpfCnpjTextField extends TextField<String> {
 
     public CpfCnpjTextField(String id, IModel<String> model) {

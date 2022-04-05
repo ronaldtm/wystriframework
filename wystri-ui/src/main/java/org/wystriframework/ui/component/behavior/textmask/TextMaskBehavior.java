@@ -16,6 +16,7 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import com.github.openjson.JSONObject;
 import com.google.common.base.Joiner;
 
+@SuppressWarnings("serial")
 public class TextMaskBehavior extends Behavior {
 
     private boolean extraOnlyIfEnabled = false;
@@ -58,7 +59,7 @@ public class TextMaskBehavior extends Behavior {
         };
     }
 
-    public static TextMaskBehavior cpf() {
+	public static TextMaskBehavior cpf() {
         return new TextMaskBehavior() {
             @Override
             protected void extraRenderHead(Component component, IHeaderResponse response) {
@@ -77,7 +78,7 @@ public class TextMaskBehavior extends Behavior {
         return money(currencySymbol, showSymbol, false);
     }
 
-    public static TextMaskBehavior money(String currencySymbol, boolean showSymbol, boolean allowNegative) {
+	public static TextMaskBehavior money(String currencySymbol, boolean showSymbol, boolean allowNegative) {
         return new TextMaskBehavior() {
             @Override
             protected void extraRenderHead(Component component, IHeaderResponse response) {
@@ -98,6 +99,7 @@ public class TextMaskBehavior extends Behavior {
     public static TextMaskBehavior ddmmyyyyYearRange(Range<Integer> range) {
         return ddmmyyyyYearRange(range.getMinimum(), range.getMaximum());
     }
+    
     public static TextMaskBehavior ddmmyyyyYearRange(Integer minYear, Integer maxYear) {
         return new TextMaskBehavior() {
             @Override

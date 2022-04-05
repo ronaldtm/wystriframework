@@ -22,6 +22,7 @@ import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.form.formbuilder.appenders.BooleanFieldAppender;
 
+@SuppressWarnings("serial")
 public class SampleCommand implements Serializable {
 
     @Field(

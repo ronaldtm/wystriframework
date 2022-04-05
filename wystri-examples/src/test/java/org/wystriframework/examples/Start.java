@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory.Client;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Start {
@@ -51,7 +52,7 @@ public class Start {
             // use this certificate anywhere important as the passwords are
             // available in the source.
 
-            SslContextFactory sslContextFactory = new SslContextFactory();
+            SslContextFactory sslContextFactory = new Client();
             sslContextFactory.setKeyStoreResource(keystore);
             sslContextFactory.setKeyStorePassword("wicket");
             sslContextFactory.setKeyManagerPassword("wicket");

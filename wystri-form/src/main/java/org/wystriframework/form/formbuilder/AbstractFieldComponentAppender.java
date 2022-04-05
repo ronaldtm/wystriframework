@@ -23,9 +23,9 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 import org.wystriframework.ui.bootstrap.BSValidationStatusBehavior;
 
+@SuppressWarnings("serial")
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
-    @SuppressWarnings("unchecked")
     protected abstract <E> FormComponent<T> newFormComponent(FieldComponentContext<E, T> ctx);
 
     @Override
@@ -66,7 +66,6 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
         return new FormComponentFieldView<>(ctx);
     }
 
-    @SuppressWarnings("unchecked")
     protected void addAjaxUpdateBehavior(FormComponent<T> fieldComponent, SerializableConsumer<AjaxRequestTarget> onSuccess, SerializableConsumer<AjaxRequestTarget> onError) {
         fieldComponent.add(new AjaxFormComponentUpdatingBehavior("change") {
             @Override
@@ -90,7 +89,6 @@ public abstract class AbstractFieldComponentAppender<T> implements IFieldCompone
             this.record = record;
         }
         @Override
-        @SuppressWarnings("unchecked")
         public void onConfigure(Component comp) {
             super.onConfigure(comp);
             field.getDelegate().onAfterProcessed(fieldView, record.getObject());

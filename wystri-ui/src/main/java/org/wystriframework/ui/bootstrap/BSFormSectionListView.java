@@ -8,6 +8,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.wystriframework.ui.component.TemplatePanel;
 
+@SuppressWarnings("serial")
 public class BSFormSectionListView extends Panel {
 
     private final RepeatingView sections = new RepeatingView("sections");

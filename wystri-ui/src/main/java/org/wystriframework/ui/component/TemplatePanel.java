@@ -10,6 +10,7 @@ import org.apache.wicket.util.resource.IResourceStream;
 import org.apache.wicket.util.resource.StringResourceStream;
 import org.danekja.java.util.function.serializable.SerializableFunction;
 
+@SuppressWarnings("serial")
 public class TemplatePanel extends WebMarkupContainer
     implements IMarkupResourceStreamProvider, IMarkupCacheKeyProvider {
 

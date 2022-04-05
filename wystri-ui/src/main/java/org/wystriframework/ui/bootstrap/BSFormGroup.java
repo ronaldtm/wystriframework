@@ -35,6 +35,7 @@ import org.wystriframework.ui.util.WicketComponentUtils;
 
 import com.google.common.collect.Lists;
 
+@SuppressWarnings("serial")
 public class BSFormGroup extends Border implements ILabelProvider<String> {
 
     public enum Mode {
@@ -115,7 +116,6 @@ public class BSFormGroup extends Border implements ILabelProvider<String> {
         return ((BorderMarkupSourcingStrategy) getMarkupSourcingStrategy()).findMarkupInAssociatedFileHeader(this, child);
     }
 
-    @SuppressWarnings("unchecked")
     protected Serializable resolveLabel() {
         if (getLabel() != null)
             return getLabel().getObject();
@@ -124,7 +124,6 @@ public class BSFormGroup extends Border implements ILabelProvider<String> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected boolean resolveRequired() {
         return Boolean.TRUE.equals(getBodyContainer().visitChildren(FormComponent.class, REQUIRED_RESOLVER_VISITOR));
     }

@@ -1,10 +1,10 @@
 package org.wystriframework.ui.component.jquery;
 
-import static org.junit.Assert.*;
-import static org.wystriframework.ui.component.jquery.JQuery.*;
+import static org.junit.Assert.assertEquals;
+import static org.wystriframework.ui.component.jquery.JQuery.$;
+import static org.wystriframework.ui.component.jquery.JQuery.$document;
 
 import org.junit.Test;
-import org.wystriframework.ui.component.jquery.JQuery;
 
 public class JQueryTest {
 

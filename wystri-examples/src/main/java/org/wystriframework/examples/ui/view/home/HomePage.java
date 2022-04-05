@@ -13,6 +13,7 @@ import org.wystriframework.form.crudgen.view.wicket.CrudgenPanel;
 import org.wystriframework.form.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.ui.bootstrap.BSAlertFeedback;
 
+@SuppressWarnings("serial")
 public class HomePage extends BasePage {
     private static final long serialVersionUID = 1L;
 

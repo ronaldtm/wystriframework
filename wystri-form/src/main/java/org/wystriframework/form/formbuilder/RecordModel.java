@@ -9,6 +9,7 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
+@SuppressWarnings("serial")
 public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, IComponentInheritedModel<R> {
 
     public class FieldModel<F> implements IModel<F> {

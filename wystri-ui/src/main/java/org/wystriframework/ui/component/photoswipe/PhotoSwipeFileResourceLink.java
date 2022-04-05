@@ -12,6 +12,7 @@ import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.ui.component.FileResourceLink;
 import org.wystriframework.ui.component.photoswipe.PhotoSwipe.PSItem;
 
+@SuppressWarnings("serial")
 public class PhotoSwipeFileResourceLink<T extends IFileRef> extends FileResourceLink<T> implements IRequestListener {
 
     public PhotoSwipeFileResourceLink(String id, IModel<T> resource) {

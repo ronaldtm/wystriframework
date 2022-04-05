@@ -9,6 +9,7 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
 
+@SuppressWarnings("serial")
 public class IntegerFieldAppender extends AbstractFieldComponentAppender<Integer> {
 
     @Override

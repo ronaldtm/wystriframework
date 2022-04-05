@@ -24,6 +24,7 @@ import org.wystriframework.ui.component.jquery.JQuery;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 
+@SuppressWarnings("serial")
 public class PhotoSwipe extends Panel {
 
     public PhotoSwipe(String id) {

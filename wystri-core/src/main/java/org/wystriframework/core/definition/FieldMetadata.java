@@ -3,6 +3,7 @@ package org.wystriframework.core.definition;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
 
+@SuppressWarnings("serial")
 public class FieldMetadata implements Serializable {
 
     private LinkedHashMap<Class<? extends Serializable>, Serializable> registry = new LinkedHashMap<>();
@@ -17,7 +18,6 @@ public class FieldMetadata implements Serializable {
         return (T) registry.getOrDefault(key, defaultValue);
     }
     
-    @SuppressWarnings("unchecked")
     public <T extends Serializable> FieldMetadata put(Class<T> key, T obj) {
         registry.put(key, obj);
         return this;

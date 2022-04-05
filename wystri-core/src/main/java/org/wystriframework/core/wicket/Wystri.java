@@ -9,7 +9,6 @@ import org.apache.wicket.MetaDataKey;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.AjaxRequestTarget.IJavaScriptResponse;
 import org.apache.wicket.core.request.handler.IPageRequestHandler;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
@@ -27,6 +26,7 @@ import com.samskivert.mustache.Template;
 
 public class Wystri {
 
+	@SuppressWarnings("serial")
     private static final MetaDataKey<Wystri> WYSTRI_KEY    = new MetaDataKey<Wystri>() {};
 
     private final WystriConfiguration        configuration = new WystriConfiguration();
@@ -74,7 +74,8 @@ public class Wystri {
 
     private static class ListenerImpl implements AjaxRequestTarget.IListener, IRequestCycleListener {
 
-        private static final MetaDataKey<ListenerImpl> KEY = new MetaDataKey<ListenerImpl>() {};
+        @SuppressWarnings("serial")
+		private static final MetaDataKey<ListenerImpl> KEY = new MetaDataKey<ListenerImpl>() {};
 
         private ListenerImpl() {}
 
@@ -93,7 +94,7 @@ public class Wystri {
         public void onBeforeRespond(Map<String, Component> map, AjaxRequestTarget target) {}
 
         @Override
-        public void onAfterRespond(Map<String, Component> map, IJavaScriptResponse response) {}
+        public void onAfterRespond(Map<String, Component> map, AjaxRequestTarget target) {}
 
         // IRequestCycleListener
         @Override
@@ -108,6 +109,7 @@ public class Wystri {
         }
     }
 
+    @SuppressWarnings("serial")
     private static final class ConverterImpl<T> implements IConverter<T> {
         private final Class<T> type;
         protected ConverterImpl(Class<T> type) {

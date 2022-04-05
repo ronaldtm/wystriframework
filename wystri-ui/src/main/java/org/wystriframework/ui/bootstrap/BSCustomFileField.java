@@ -47,6 +47,7 @@ import org.wystriframework.ui.component.fileupload.CustomFileUpload;
 import org.wystriframework.ui.component.fileupload.CustomFileUploadField;
 import org.wystriframework.ui.util.IBehaviorShortcutsMixin;
 
+@SuppressWarnings("serial")
 public class BSCustomFileField extends FormComponentPanel<IFileRef> {
 
     private static final String        KEY_CLEAR_ICON      = "BSCustomFileField.clear.icon";

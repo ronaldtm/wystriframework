@@ -8,6 +8,7 @@ import org.wystriframework.core.definition.IFieldLayout;
 
 import com.querydsl.sql.RelationalPath;
 
+@SuppressWarnings("serial")
 public class QDSLEntity<E> implements IEntity<E> {
 
     private final RelationalPath<E> entityPath;

@@ -10,7 +10,7 @@ public interface IBeanLookup {
     <T> T byType(Class<T> type);
     <T> T inject(T bean);
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @SuppressWarnings({ "unchecked" })
 
     default <T, C> T newInstance(Class<T> type, String[] args) {
         for (Constructor<?> con : type.getConstructors()) {

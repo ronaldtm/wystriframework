@@ -11,6 +11,7 @@ import org.wystriframework.core.wicket.Wystri;
 
 import com.google.common.collect.Range;
 
+@SuppressWarnings("serial")
 public class RangeConstraint<T extends Comparable<T>> implements ISimpleConstraint<T> {
 
     private static final Pattern REGEX = Pattern.compile("^([\\[\\(])?\\s*([^\\[\\(]+)?\\.\\.([^\\]\\)]+)?\\s*([\\]\\)])?$");

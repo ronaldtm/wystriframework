@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.samskivert.mustache.Mustache;
 import com.samskivert.mustache.Template;
 
+@SuppressWarnings("serial")
 public class BSFormControlMarkupResolver implements Serializable {
 
     private static final MetaDataKey<ITemplateProvider<BSFormLayoutConfig>> TEMPLATE_PROVIDER_KEY  = new MetaDataKey<ITemplateProvider<BSFormLayoutConfig>>() {};

@@ -12,6 +12,7 @@ import org.wystriframework.ui.util.WicketComponentUtils;
 
 import com.google.common.base.Preconditions;
 
+@SuppressWarnings("serial")
 public class BSFormRow extends Border implements IBSFormGroupLayout {
 
     private SerializableBiFunction<String, MarkupContainer, Component> feedbackComponentFactory = (id, fence) -> new BSValidationFeedback(id, fence);

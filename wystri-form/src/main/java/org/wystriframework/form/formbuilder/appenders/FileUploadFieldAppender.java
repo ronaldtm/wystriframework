@@ -7,6 +7,7 @@ import org.wystriframework.form.formbuilder.AbstractFieldComponentAppender;
 import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.ui.bootstrap.BSCustomFileField;
 
+@SuppressWarnings("serial")
 public class FileUploadFieldAppender extends AbstractFieldComponentAppender<IFileRef> {
 
     @Override

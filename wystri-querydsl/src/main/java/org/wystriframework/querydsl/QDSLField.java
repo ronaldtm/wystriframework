@@ -19,6 +19,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.sql.ColumnMetadata;
 import com.querydsl.sql.RelationalPath;
 
+@SuppressWarnings("serial")
 public class QDSLField<E, F> implements IField<E, F> {
 
     private final QDSLEntity<E>                entity;

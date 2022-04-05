@@ -6,6 +6,7 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.form.formbuilder.EntityFormBuilder;
 import org.wystriframework.ui.component.photoswipe.PhotoSwipe;
 
+@SuppressWarnings("serial")
 public class CrudgenPanel<R extends IRecord<E>, E> extends Panel {
 
     private EntityFormBuilder entityFormBuilder = new EntityFormBuilder();
