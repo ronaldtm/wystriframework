@@ -1,6 +1,6 @@
 package org.wystriframework.examples.command;
 
-import static java.util.Arrays.*;
+import static java.util.Arrays.asList;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,7 +22,6 @@ import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.form.formbuilder.appenders.BooleanFieldAppender;
 
-@SuppressWarnings("serial")
 public class SampleCommand implements Serializable {
 
     @Field(
@@ -133,21 +132,6 @@ public class SampleCommand implements Serializable {
                 "Butch",
                 "Femme (Fem)",
                 "Binarism");
-        }
-
-        @Override
-        public String objectToId(String object) {
-            return object;
-        }
-
-        @Override
-        public String idToObject(String id, List<? extends String> options) {
-            return id;
-        }
-
-        @Override
-        public String objectToDisplay(String object, List<? extends String> options) {
-            return object;
         }
     }
 }

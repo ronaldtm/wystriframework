@@ -19,7 +19,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <wicket.version>9.9.0</wicket.version>
     <spring.version>5.3.18</spring.version>
-    <jetty9.version>9.4.45.v20220203</jetty9.version>
+    <servlet-api.version>4.0.1</servlet-api.version>
+    <jetty.version>10.0.9</jetty.version>
     <slf4j.version>1.7.36</slf4j.version>
     <p6spy.version>3.3.0</p6spy.version>
     <junit.version>4.13.2</junit.version>
@@ -135,25 +136,31 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
+      <version>${servlet-api.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>${jetty9.version}</version>
+      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-plus</artifactId>
-      <version>${jetty9.version}</version>
+      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jndi</artifactId>
-      <version>${jetty9.version}</version>
+      <version>${jetty.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -163,13 +170,6 @@
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
-      <version>8.0.1</version>
-      <scope>provided</scope>
     </dependency>
 
   </dependencies>

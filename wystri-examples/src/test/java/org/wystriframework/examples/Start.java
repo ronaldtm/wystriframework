@@ -10,7 +10,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.util.ssl.SslContextFactory.Client;
+import org.eclipse.jetty.webapp.Configurations;
 import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Start {
@@ -26,8 +26,9 @@ public class Start {
         System.setProperty("spring.profiles.active", "development");
 
         Server server = new Server();
-        org.eclipse.jetty.webapp.Configuration.ClassList classlist = org.eclipse.jetty.webapp.Configuration.ClassList.setServerDefault(server);
-        classlist.addAfter(
+
+        Configurations classlist = Configurations.setServerDefault(server);
+        classlist.add(
             "org.eclipse.jetty.webapp.FragmentConfiguration",
             "org.eclipse.jetty.plus.webapp.EnvConfiguration",
             "org.eclipse.jetty.plus.webapp.PlusConfiguration");
@@ -52,7 +53,7 @@ public class Start {
             // use this certificate anywhere important as the passwords are
             // available in the source.
 
-            SslContextFactory sslContextFactory = new Client();
+            SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
             sslContextFactory.setKeyStoreResource(keystore);
             sslContextFactory.setKeyStorePassword("wicket");
             sslContextFactory.setKeyManagerPassword("wicket");
