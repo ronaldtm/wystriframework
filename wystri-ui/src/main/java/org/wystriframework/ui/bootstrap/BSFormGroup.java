@@ -35,7 +35,6 @@ import org.wystriframework.ui.util.WicketComponentUtils;
 
 import com.google.common.collect.Lists;
 
-@SuppressWarnings("serial")
 public class BSFormGroup extends Border implements ILabelProvider<String> {
 
     public enum Mode {

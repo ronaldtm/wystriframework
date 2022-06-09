@@ -12,6 +12,8 @@ import org.wystriframework.annotation.Bool;
 import org.wystriframework.annotation.ConstraintFor;
 import org.wystriframework.annotation.CustomView;
 import org.wystriframework.annotation.Field;
+import org.wystriframework.annotation.FormLayout;
+import org.wystriframework.annotation.FormLayout.*;
 import org.wystriframework.annotation.Selection;
 import org.wystriframework.annotation.constraints.Length;
 import org.wystriframework.annotation.constraints.Range;
@@ -22,6 +24,12 @@ import org.wystriframework.core.definition.IOptionsProvider;
 import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.form.formbuilder.appenders.BooleanFieldAppender;
 
+@FormLayout(sections = {
+    @Section(title = "Dados Pessoais", value = {
+        @Row({ @Cell("annonymous") }),
+        @Row({ @Cell("name"), @Cell("profilePhoto") }),
+    })
+})
 public class SampleCommand implements Serializable {
 
     @Field(
@@ -61,9 +69,11 @@ public class SampleCommand implements Serializable {
     })
     public Integer  monthOfBirth;
 
-    @Selection({ "M", "F" })
+    @Field(label = "Sexo")
+    @Selection({ "Male", "Female", "Other" })
     public String   sex;
 
+    @Field(label = "Gênero")
     @Selection(provider = SampleCommand.GenderOptionsProvider.class)
     public String   gender;
 

@@ -35,6 +35,7 @@ import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Url;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.request.resource.ResourceReference;
 import org.apache.wicket.util.lang.Bytes;
@@ -45,9 +46,9 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.ui.component.fileupload.CustomDiskFileItem;
 import org.wystriframework.ui.component.fileupload.CustomFileUpload;
 import org.wystriframework.ui.component.fileupload.CustomFileUploadField;
-import org.wystriframework.ui.util.IBehaviorShortcutsMixin;
+import org.wystriframework.ui.component.photoswipe.PhotoSwipe;
+import static org.wystriframework.ui.util.IBehaviorShortcutsMixin.*;
 
-@SuppressWarnings("serial")
 public class BSCustomFileField extends FormComponentPanel<IFileRef> {
 
     private static final String        KEY_CLEAR_ICON      = "BSCustomFileField.clear.icon";
@@ -83,7 +84,7 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
 
             .add(linkGroup
                 .add(downloadLink.setBody(fileDescription)
-                    .add(IBehaviorShortcutsMixin.$b.attrReplace("target", "_" + getClass().getSimpleName() + "_" + downloadLink.getMarkupId())))
+                    .add($b.attrReplace("target", "_" + getClass().getSimpleName() + "_" + downloadLink.getMarkupId())))
                 .add(newClearLink("clearLink")
                     .add(newClearIcon("clearIcon"))))
 
@@ -122,7 +123,9 @@ public class BSCustomFileField extends FormComponentPanel<IFileRef> {
     }
 
     protected AbstractLink newDownloadLink(String id) {
-        return new ExternalLink(id, () -> getDownloadURL());
+        ExternalLink link = new ExternalLink(id, () -> getDownloadURL());
+        link.add($b.ready(c -> $(c).on("click", PhotoSwipe.getJavascriptFunction(link, PhotoSwipe.img(Url.parse(getDownloadURL()))))));
+        return link;
     }
     protected Component newClearIcon(String id) {
         return new ClearIcon(id);

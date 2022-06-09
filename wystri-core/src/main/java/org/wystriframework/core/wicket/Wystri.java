@@ -26,8 +26,7 @@ import com.samskivert.mustache.Template;
 
 public class Wystri {
 
-	@SuppressWarnings("serial")
-    private static final MetaDataKey<Wystri> WYSTRI_KEY    = new MetaDataKey<Wystri>() {};
+	private static final MetaDataKey<Wystri> WYSTRI_KEY    = new MetaDataKey<Wystri>() {};
 
     private final WystriConfiguration        configuration = new WystriConfiguration();
 
@@ -74,8 +73,7 @@ public class Wystri {
 
     private static class ListenerImpl implements AjaxRequestTarget.IListener, IRequestCycleListener {
 
-        @SuppressWarnings("serial")
-		private static final MetaDataKey<ListenerImpl> KEY = new MetaDataKey<ListenerImpl>() {};
+        private static final MetaDataKey<ListenerImpl> KEY = new MetaDataKey<ListenerImpl>() {};
 
         private ListenerImpl() {}
 
@@ -109,7 +107,6 @@ public class Wystri {
         }
     }
 
-    @SuppressWarnings("serial")
     private static final class ConverterImpl<T> implements IConverter<T> {
         private final Class<T> type;
         protected ConverterImpl(Class<T> type) {

@@ -4,7 +4,6 @@ import org.apache.wicket.Component;
 import org.apache.wicket.MetaDataKey;
 import org.wystriframework.core.definition.IFieldView;
 
-@SuppressWarnings("serial")
 public class WystriWicketUtils {
 
     private static final MetaDataKey<IFieldView<?, ?>> FIELD_VIEW_KEY = new MetaDataKey<IFieldView<?, ?>>() {};

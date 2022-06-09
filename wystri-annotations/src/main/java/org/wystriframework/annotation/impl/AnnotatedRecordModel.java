@@ -3,7 +3,6 @@ package org.wystriframework.annotation.impl;
 import org.apache.wicket.model.IModel;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 
-@SuppressWarnings("serial")
 public class AnnotatedRecordModel<E> implements IModel<AnnotatedRecord<E>> {
 
     private final IModel<E>          objectRef;

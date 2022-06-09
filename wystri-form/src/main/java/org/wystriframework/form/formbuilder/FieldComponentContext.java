@@ -12,7 +12,6 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 import org.wystriframework.ui.bootstrap.IBSFormGroupLayout;
 
-@SuppressWarnings("serial")
 public class FieldComponentContext<E, F> implements Serializable {
 
     private static final StringValue                   EMPTY_PARAM = StringValue.valueOf("");

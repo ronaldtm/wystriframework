@@ -10,7 +10,6 @@ import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldView;
 import org.wystriframework.core.wicket.Wystri;
 
-@SuppressWarnings("serial")
 public class FormComponentFieldView<E, T> implements IFieldView<E, T> {
 
     private final FieldComponentContext<E, T> ctx;

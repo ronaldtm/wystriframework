@@ -4,7 +4,6 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.danekja.java.util.function.serializable.SerializableConsumer;
 
-@SuppressWarnings("serial")
 public class AjaxFormComponentUpdatingActionBehavior extends AjaxFormComponentUpdatingBehavior {
 
     private SerializableConsumer<AjaxRequestTarget> action = t -> {};

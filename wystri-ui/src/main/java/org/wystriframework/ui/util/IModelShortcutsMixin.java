@@ -16,7 +16,6 @@ import org.danekja.java.util.function.serializable.SerializableSupplier;
 import org.wicketstuff.lazymodel.LazyModel;
 import org.wystriframework.ui.component.model.NullModel;
 
-@SuppressWarnings("serial")
 public interface IModelShortcutsMixin {
     static IModelShortcutsMixin $m = ModelShortcutsImpl.$m;
 

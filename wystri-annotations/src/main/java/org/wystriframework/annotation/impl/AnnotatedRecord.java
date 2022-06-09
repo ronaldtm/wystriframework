@@ -3,7 +3,6 @@ package org.wystriframework.annotation.impl;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-@SuppressWarnings("serial")
 public class AnnotatedRecord<E> implements IRecord<E> {
 
     private final AnnotatedEntity<E> entity;

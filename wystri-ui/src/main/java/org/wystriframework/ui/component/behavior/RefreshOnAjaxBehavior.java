@@ -6,7 +6,6 @@ import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.event.IEvent;
 import org.danekja.java.util.function.serializable.SerializablePredicate;
 
-@SuppressWarnings("serial")
 public class RefreshOnAjaxBehavior extends Behavior {
 
     private SerializablePredicate<Component> active;

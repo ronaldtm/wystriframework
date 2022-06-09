@@ -7,7 +7,6 @@ import org.wystriframework.core.definition.IEntity;
 import org.wystriframework.core.definition.IFieldLayout;
 import org.wystriframework.core.util.ReflectionUtils;
 
-@SuppressWarnings("serial")
 public class AnnotatedEntity<E> implements IEntity<E> {
 
     private String   name;

@@ -23,7 +23,6 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 import org.wystriframework.ui.bootstrap.BSValidationStatusBehavior;
 
-@SuppressWarnings("serial")
 public abstract class AbstractFieldComponentAppender<T> implements IFieldComponentAppender<T> {
 
     protected abstract <E> FormComponent<T> newFormComponent(FieldComponentContext<E, T> ctx);

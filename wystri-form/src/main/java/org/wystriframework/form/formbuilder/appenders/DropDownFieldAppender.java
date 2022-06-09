@@ -19,7 +19,6 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.FormComponentFieldView;
 import org.wystriframework.form.formbuilder.RecordModel;
 
-@SuppressWarnings("serial")
 public class DropDownFieldAppender<T> extends AbstractFieldComponentAppender<T> {
 
     @Override

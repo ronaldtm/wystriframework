@@ -9,7 +9,6 @@ public interface IFieldLayout<E> extends Serializable {
 
     List<Section> getSections();
 
-    @SuppressWarnings("serial")
     public static class Section implements Serializable {
         private final String                title;
         private final ImmutableList<Row> rows;
@@ -23,7 +22,6 @@ public interface IFieldLayout<E> extends Serializable {
         //@formatter:on
     }
 
-    @SuppressWarnings("serial")
     public static class Row implements Serializable {
         private final ImmutableList<Cell> cells;
         public Row(List<Cell> cells) {
@@ -34,7 +32,6 @@ public interface IFieldLayout<E> extends Serializable {
         //@formatter:on
     }
 
-    @SuppressWarnings("serial")
     public static class Cell implements Serializable {
         private final IField<?, ?> field;
         private final String       spec;

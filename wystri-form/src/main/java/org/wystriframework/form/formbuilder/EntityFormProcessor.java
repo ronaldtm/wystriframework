@@ -12,7 +12,6 @@ import org.wystriframework.core.definition.IRecord;
 
 public class EntityFormProcessor {
 
-    @SuppressWarnings("serial")
     private static final MetaDataKey<IFieldView<?, ?>> FIELD_VIEW = new MetaDataKey<IFieldView<?, ?>>() {};
 
     @SuppressWarnings("unchecked")

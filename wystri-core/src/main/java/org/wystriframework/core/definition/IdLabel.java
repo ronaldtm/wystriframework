@@ -2,7 +2,6 @@ package org.wystriframework.core.definition;
 
 import java.io.Serializable;
 
-@SuppressWarnings("serial")
 public final class IdLabel<ID extends Serializable, T> implements Serializable {
     private final ID       id;
     private final String   label;

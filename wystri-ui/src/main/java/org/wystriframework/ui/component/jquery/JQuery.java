@@ -16,7 +16,6 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import com.github.openjson.JSONObject;
 import com.google.common.base.Joiner;
 
-@SuppressWarnings("serial")
 public final class JQuery implements Serializable, CharSequence {
 
     //private StringBuilder buffer = new StringBuilder();

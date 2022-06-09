@@ -42,6 +42,6 @@ public @interface FormLayout {
     public @interface Cell {
         static String DEFAULT_SPEC = "col";
         String spec() default DEFAULT_SPEC;
-        String name() default "";
+        String value() default "";
     }
 }

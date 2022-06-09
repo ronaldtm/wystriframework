@@ -10,7 +10,6 @@ import org.wystriframework.core.util.UncheckedAppendable;
 import org.wystriframework.ui.component.TemplatePanel;
 import org.wystriframework.ui.component.behavior.RefreshOnAjaxBehavior;
 
-@SuppressWarnings("serial")
 public class BSFormRowLayout extends TemplatePanel implements IBSFormGroupLayout {
 
     private BSFormLayoutConfig                                         layoutConfig              = new BSFormLayoutConfig(BSSize.sm);

@@ -7,7 +7,6 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
-@SuppressWarnings("serial")
 public class BasePage extends WebPage implements IAjaxIndicatorAware {
     private static final long        serialVersionUID = 1L;
 

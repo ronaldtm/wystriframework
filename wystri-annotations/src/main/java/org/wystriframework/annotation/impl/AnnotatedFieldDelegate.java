@@ -13,7 +13,6 @@ import org.wystriframework.core.definition.IRecord;
 import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 
-@SuppressWarnings("serial")
 public class AnnotatedFieldDelegate<E, F> implements IFieldDelegate<E, F> {
 
     @Override

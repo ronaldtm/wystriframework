@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wystriframework.core.definition.IFileRef;
 
-@SuppressWarnings("serial")
 public class SessionScopedTempFileDownloadResource extends AbstractResource {
 
 	private static final Logger log = LoggerFactory.getLogger(SessionScopedTempFileDownloadResource.class);

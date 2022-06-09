@@ -13,7 +13,6 @@ import org.apache.wicket.validation.validator.RangeValidator;
 public interface IValidatorShortcutsMixin {
     static IValidatorShortcutsMixin $v = ValidatorShortcutsImpl.$v;
 
-    @SuppressWarnings("serial")
     default IFormValidator notAllBlank(String msg, FormComponent<?>... components) {
         return new IFormValidator() {
             @Override
@@ -38,7 +37,6 @@ public interface IValidatorShortcutsMixin {
         return RangeValidator.range(min, max);
     }
 
-    @SuppressWarnings("serial")
     default IValidator<Boolean> checkRequired(String msg) {
         return new IValidator<Boolean>() {
             @Override

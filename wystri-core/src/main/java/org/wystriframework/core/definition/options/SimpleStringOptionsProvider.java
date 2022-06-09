@@ -7,7 +7,6 @@ import org.wystriframework.core.definition.IRecord;
 
 import com.google.common.collect.ImmutableList;
 
-@SuppressWarnings("serial")
 public class SimpleStringOptionsProvider<E> implements IOptionsProvider<E, String> {
 
     private ImmutableList<String> options;

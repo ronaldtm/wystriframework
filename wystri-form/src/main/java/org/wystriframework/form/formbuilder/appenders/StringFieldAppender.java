@@ -16,7 +16,6 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.RecordModel;
 import org.wystriframework.ui.util.IBehaviorShortcutsMixin;
 
-@SuppressWarnings("serial")
 public class StringFieldAppender extends AbstractFieldComponentAppender<String> {
 
     @Override

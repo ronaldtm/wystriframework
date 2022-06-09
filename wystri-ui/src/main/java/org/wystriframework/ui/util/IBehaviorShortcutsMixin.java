@@ -25,7 +25,6 @@ import org.wystriframework.ui.component.behavior.EnabledIfBehavior;
 import org.wystriframework.ui.component.behavior.VisibleIfBehavior;
 import org.wystriframework.ui.component.jquery.JQuery;
 
-@SuppressWarnings("serial")
 public interface IBehaviorShortcutsMixin {
     static IBehaviorShortcutsMixin $b = BehaviorShortcutsImpl.$b;
 
@@ -174,13 +173,11 @@ public interface IBehaviorShortcutsMixin {
 enum BehaviorShortcutsImpl implements IBehaviorShortcutsMixin {
     $b;
 
-    @SuppressWarnings("serial")
-	static final class NonBlockingAjaxFormComponentUpdatingBehavior extends AjaxFormComponentUpdatingActionBehavior implements NullAjaxIndicatorAware {
+    static final class NonBlockingAjaxFormComponentUpdatingBehavior extends AjaxFormComponentUpdatingActionBehavior implements NullAjaxIndicatorAware {
         NonBlockingAjaxFormComponentUpdatingBehavior(String event) {
             super(event);
         }
     }
-    @SuppressWarnings("serial")
     static abstract class NonBlockingBehavior extends Behavior implements NullAjaxIndicatorAware {}
     static interface NullAjaxIndicatorAware extends IAjaxIndicatorAware {
         @Override

@@ -5,6 +5,7 @@ import static org.wystriframework.ui.util.IBehaviorShortcutsMixin.*;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 //import javax.json.Json;
 //import javax.json.JsonArrayBuilder;
@@ -24,7 +25,6 @@ import org.wystriframework.ui.component.jquery.JQuery;
 import com.github.openjson.JSONArray;
 import com.github.openjson.JSONObject;
 
-@SuppressWarnings("serial")
 public class PhotoSwipe extends Panel {
 
     public PhotoSwipe(String id) {
@@ -53,22 +53,26 @@ public class PhotoSwipe extends Panel {
         return getJavascriptFunction(comp, Arrays.asList(items));
     }
     public static String getJavascriptFunction(Component comp, Collection<PSItem> items) {
-        final PhotoSwipe ps = findPhotoSwipe(comp);
-
-        return (ps == null) ? null
-            : "(function() { "
-                + JQuery.$(ps) + ".photoswipe({"
+        return findPhotoSwipe(comp)
+            .map(ps -> ""
+                + "(function(evt) {"
+                + "  " + JQuery.$(ps) + ".photoswipe({"
                 + "  items:" + toString(items)
-                + "  }); "
-                + "})";
+                + "  });"
+                + "  evt.preventDefault();"
+                + "})")
+            .orElse("(function() {})");
     }
 
-    private static PhotoSwipe findPhotoSwipe(Component comp) {
-        return comp.visitParents(MarkupContainer.class, (container, visit) -> container.stream()
+    public static boolean hasSupport(Component comp) {
+        return findPhotoSwipe(comp).isPresent();
+    }
+    private static Optional<PhotoSwipe> findPhotoSwipe(Component comp) {
+        return Optional.ofNullable(comp.visitParents(MarkupContainer.class, (container, visit) -> container.stream()
             .filter(it -> it instanceof PhotoSwipe)
             .map(it -> (PhotoSwipe) it)
             .findFirst()
-            .ifPresent(it -> visit.stop(it)));
+            .ifPresent(it -> visit.stop(it))));
     }
 
     private static String toString(Collection<PSItem> items) {
@@ -77,19 +81,23 @@ public class PhotoSwipe extends Panel {
     }
 
     public static PSItem html(String html) {
-        return () -> new JSONObject().append("html", html);
+        return () -> new JSONObject().put("html", html);
     }
     public static PSItem iframe(Url url) {
-        return () -> new JSONObject().append("html", "<iframe src='" + url + "' style='position:relative;width:100%;height:100%;margin-top:44px;'></iframe>");
+        String surl = url.toString();
+        return () -> new JSONObject().put("html", "<iframe src='" + surl + "' style='position:relative;width:100%;height:100%;margin-top:44px;'></iframe>");
     }
     public static PSItem pdf(Url url) {
-        return () -> new JSONObject().append("html", "<iframe src='" + url + "' style='position:relative;width:100%;height:100%;margin-top:44px;'></iframe>");
+        String surl = url.toString();
+        return () -> new JSONObject().put("html", "<iframe src='" + surl + "' style='position:relative;width:100%;height:100%;margin-top:44px;'></iframe>");
     }
     public static PSItem img(Url url) {
-        return () -> new JSONObject().append("src", url.toString());
+        String surl = url.toString();
+        return () -> new JSONObject().put("src", surl);
     }
     public static PSItem img(Url url, int w, int h) {
-        return () -> new JSONObject().append("src", url.toString()).append("w", w).append("h", h);
+        String surl = url.toString();
+        return () -> new JSONObject().put("src", surl).put("w", w).put("h", h);
     }
 
     public static interface PSItem extends SerializableSupplier<JSONObject> {}

@@ -4,7 +4,6 @@ import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.wystriframework.core.definition.IRecord;
 
-@SuppressWarnings("serial")
 public class EntityPanel<R extends IRecord<E>, E> extends FormComponentPanel<R> {
 
     private EntityFormBuilder entityFormBuilder = new EntityFormBuilder();

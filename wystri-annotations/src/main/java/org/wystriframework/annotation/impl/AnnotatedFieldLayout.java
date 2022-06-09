@@ -16,7 +16,6 @@ import org.wystriframework.annotation.FormLayout;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IFieldLayout;
 
-@SuppressWarnings("serial")
 public class AnnotatedFieldLayout<E> implements IFieldLayout<E> {
 
     private final AnnotatedEntity<E> entity;
@@ -97,7 +96,7 @@ public class AnnotatedFieldLayout<E> implements IFieldLayout<E> {
         for (FormLayout.Row row : fRows) {
             final List<Cell> cells = new ArrayList<>();
             for (FormLayout.Cell cell : row.value())
-                cells.add(new Cell(fields.remove(cell.name()), cell.spec()));
+                cells.add(new Cell(fields.remove(cell.value()), cell.spec()));
             rows.add(new Row(cells));
         }
         return new Section(title, rows);

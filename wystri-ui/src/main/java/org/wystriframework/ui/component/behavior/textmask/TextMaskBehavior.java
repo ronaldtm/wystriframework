@@ -16,7 +16,6 @@ import org.apache.wicket.markup.head.OnDomReadyHeaderItem;
 import com.github.openjson.JSONObject;
 import com.google.common.base.Joiner;
 
-@SuppressWarnings("serial")
 public class TextMaskBehavior extends Behavior {
 
     private boolean extraOnlyIfEnabled = false;
@@ -84,9 +83,9 @@ public class TextMaskBehavior extends Behavior {
             protected void extraRenderHead(Component component, IHeaderResponse response) {
                 final JSONObject opts = new JSONObject();
                 if (showSymbol)
-                    opts.append("prefix", currencySymbol);
+                    opts.put("prefix", currencySymbol);
                 if (allowNegative)
-                    opts.append("allowNegative", true);
+                    opts.put("allowNegative", true);
 
                 response.render(OnDomReadyHeaderItem
                     .forScript(String.format("TextMaskBehavior.money(%s, %s);",

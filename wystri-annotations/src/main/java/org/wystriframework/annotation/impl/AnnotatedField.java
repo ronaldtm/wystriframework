@@ -39,7 +39,6 @@ import org.wystriframework.core.wicket.Wystri;
 import org.wystriframework.core.wicket.WystriConfiguration;
 import org.wystriframework.form.formbuilder.IFieldComponentAppender;
 
-@SuppressWarnings("serial")
 public class AnnotatedField<E, F> implements IField<E, F> {
 
     private final AnnotatedEntity<E>   entity;

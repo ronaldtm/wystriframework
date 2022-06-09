@@ -2,7 +2,6 @@ package org.wystriframework.core.definition.constraints;
 
 import org.wystriframework.core.definition.IConstrainable;
 
-@SuppressWarnings("serial")
 public class LengthConstraint implements ISimpleConstraint<String> {
 
     private int min = 0;

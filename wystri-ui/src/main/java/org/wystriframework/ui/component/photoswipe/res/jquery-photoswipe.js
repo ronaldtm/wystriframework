@@ -169,10 +169,10 @@
 \n        <div class='pswp__ui pswp__ui--hidden'>\
 \n          <div class='pswp__top-bar'>\
 \n            <div class='pswp__counter'></div>\
-\n            <button class='pswp__button pswp__button--close' title='Close (Esc)'></button>\
-\n            <button class='pswp__button pswp__button--share' title='Share'></button>\
-\n            <button class='pswp__button pswp__button--fs' title='Toggle fullscreen'></button>\
-\n            <button class='pswp__button pswp__button--zoom' title='Zoom in/out'></button>\
+\n            <button type='button' class='pswp__button pswp__button--close' title='Close (Esc)'></button>\
+\n            <button type='button' class='pswp__button pswp__button--share' title='Share'></button>\
+\n            <button type='button' class='pswp__button pswp__button--fs'    title='Toggle fullscreen'></button>\
+\n            <button type='button' class='pswp__button pswp__button--zoom'  title='Zoom in/out'></button>\
 \n            <div class='pswp__preloader'>\
 \n              <div class='pswp__preloader__icn'>\
 \n                <div class='pswp__preloader__cut'>\

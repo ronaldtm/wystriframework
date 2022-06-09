@@ -5,7 +5,6 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.event.IEvent;
 
-@SuppressWarnings("serial")
 public class EntityFormProcessorBehavior extends Behavior {
 
     @Override

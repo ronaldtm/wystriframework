@@ -24,7 +24,6 @@ import org.apache.wicket.util.string.Strings;
  * 
  * @see FileUploadField
  */
-@SuppressWarnings("serial")
 public class CustomFileUploadField extends FileUploadField {
     public CustomFileUploadField(final String id) {
         super(id);

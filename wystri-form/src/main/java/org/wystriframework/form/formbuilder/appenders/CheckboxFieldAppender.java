@@ -9,7 +9,6 @@ import org.wystriframework.form.formbuilder.FieldComponentContext;
 import org.wystriframework.form.formbuilder.RecordModel;
 import org.wystriframework.ui.bootstrap.BSFormGroup;
 
-@SuppressWarnings("serial")
 public class CheckboxFieldAppender extends AbstractFieldComponentAppender<Boolean> {
 
     @Override

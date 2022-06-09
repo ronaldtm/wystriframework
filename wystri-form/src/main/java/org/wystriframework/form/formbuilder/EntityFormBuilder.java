@@ -39,7 +39,6 @@ import org.wystriframework.ui.bootstrap.IBSFormGroupLayout;
 
 import com.google.common.collect.ImmutableMap;
 
-@SuppressWarnings("serial")
 public class EntityFormBuilder implements Serializable {
 
     private static final SerializableSupplier<IFieldComponentAppender<?>> DEFAULT_APPENDER = StringFieldAppender::new;

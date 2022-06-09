@@ -12,8 +12,8 @@ import org.wystriframework.examples.ui.view.BasePage;
 import org.wystriframework.form.crudgen.view.wicket.CrudgenPanel;
 import org.wystriframework.form.formbuilder.EntityFormProcessorBehavior;
 import org.wystriframework.ui.bootstrap.BSAlertFeedback;
+import org.wystriframework.ui.component.photoswipe.PhotoSwipe;
 
-@SuppressWarnings("serial")
 public class HomePage extends BasePage {
     private static final long serialVersionUID = 1L;
 
@@ -27,6 +27,8 @@ public class HomePage extends BasePage {
         final Form<?> form = new Form<Void>("form") {};
 
         form.setMultiPart(true);
+
+        add(new PhotoSwipe("photoSwipe"));
 
         add(form
 

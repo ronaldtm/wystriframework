@@ -12,7 +12,6 @@ import org.wystriframework.core.definition.IFileRef;
 import org.wystriframework.ui.component.FileResourceLink;
 import org.wystriframework.ui.component.photoswipe.PhotoSwipe.PSItem;
 
-@SuppressWarnings("serial")
 public class PhotoSwipeFileResourceLink<T extends IFileRef> extends FileResourceLink<T> implements IRequestListener {
 
     public PhotoSwipeFileResourceLink(String id, IModel<T> resource) {
@@ -21,7 +20,7 @@ public class PhotoSwipeFileResourceLink<T extends IFileRef> extends FileResource
 
     @Override
     public void renderHead(IHeaderResponse response) {
-        if (getModelObject().isValid()) {
+        if (getModelObject().isValid() && PhotoSwipe.hasSupport(this)) {
 
             final PSItem item = toItem();
             if (item != null) {
