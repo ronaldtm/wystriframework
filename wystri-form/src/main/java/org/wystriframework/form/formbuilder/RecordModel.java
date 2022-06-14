@@ -9,7 +9,7 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-public class RecordModel<R extends IRecord<E>, E> implements IModel<R>, IComponentInheritedModel<R> {
+public class RecordModel<R extends IRecord<E>, E> implements IComponentInheritedModel<R> {
 
     public class FieldModel<F> implements IModel<F> {
         private final IField<E, F>           field;

@@ -5,7 +5,7 @@ import org.apache.wicket.model.IWrapModel;
 import org.wystriframework.core.definition.IField;
 import org.wystriframework.core.definition.IRecord;
 
-public class FieldModel<E, T> implements IModel<T>, IWrapModel<T> {
+public class FieldModel<E, T> implements IWrapModel<T> {
 
     private final IModel<IRecord<E>> recordModel;
     private final IField<E, T>       field;
